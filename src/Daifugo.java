@@ -37,15 +37,68 @@ public class Daifugo {
 		infoCenter = new InfoCenter(players);
 
 		for(int r=0; r<nRounds; r++) {
-			startNewgame(infoCenter, deck, players);
-		}
+			System.out.println("=========="+"Round "+(r+1)+"==========");
+			startNewGame(infoCenter, deck, players);
 
-		/*test deck cards*/
-		for(int i=0; i<52; i++) {
-			System.out.print("" + deck.getNextCard() + " ");
-		}
+			/*test player get card*/
+			for(int i=0; i<nPlayer; i++) {
+				System.out.println("Player"+i+" : ");
+				ArrayList<Card> hand = infoCenter.getPlayerHand(players.get(i));
+				for(int j=0; j<hand.size(); j++) {
+					System.out.print(hand.get(j)+" ");
+				}
+				System.out.println();
+			}
 
-		
+			while(infoCenter.getPlayingNumber() > 0) {
+				int skipNumber = 0;
+				for(int i=0; i<nPlayer; i++) {
+					Player p = players.get(i);
+					if(!infoCenter.getPlayerNoHand(p)) {
+						if(infoCenter.getPlayerIsLeader(p) && infoCenter.getPlayerIsLastPlayer(p)) {
+							// 
+							// can't skip, do anything you want.
+							// 
+
+						} else if(infoCenter.getPlayerIsLeader(p) && !infoCenter.getPlayerIsLastPlayer(p)) {
+							// 
+							// can skip or play hand
+							// 
+							if(true) {
+								skipNumber++;
+							} else {
+								infoCenter.setPlayerIsLastPlayer(p);
+							}
+
+						} else if(!infoCenter.getPlayerIsLeader(p) && infoCenter.getPlayerIsLastPlayer(p)) {
+							// 
+							// become leader, can't skip, do anythings you want
+							// 
+							infoCenter.setPlayerIsLeader(p);
+
+						} else if(!infoCenter.getPlayerIsLeader(p) && !infoCenter.getPlayerIsLastPlayer(p) &&
+									infoCenter.getPlayingNumber() == skipNumber) {
+							// 
+							// become leader and the last player, can't skip, do anythings you want
+							// 
+							infoCenter.setPlayerIsLeader(p);
+							infoCenter.setPlayerIsLastPlayer(p);
+
+						} else {
+							// 
+							// can skip or play hand
+							// 
+							if(true) {
+								skipNumber++;
+							} else {
+								infoCenter.setPlayerIsLastPlayer(p);
+							}
+						}
+					}
+				}
+			}
+		}
+		System.out.println("===========================");
 	}
 
 	public static void getInitSetting() {
@@ -117,7 +170,8 @@ public class Daifugo {
  		Collections.shuffle(players);
 	}
 
-	public static void startNewgame(InfoCenter _infoCenter, Deck _deck, ArrayList<Player> _players) {
+	public static void startNewGame(InfoCenter _infoCenter, Deck _deck, ArrayList<Player> _players) {
+		_infoCenter.startNewGame();
 		// 
  		// init deck setting
  		// 
@@ -129,22 +183,34 @@ public class Daifugo {
 		Player firstPlayer = null;  
 		if(_infoCenter.firstGame) {
 			_infoCenter.firstGame = false;
-			for(int i=0; i<54; i++) {
+			int cardNumber = 0;
+			while(cardNumber<54) {
 				for(int j=0; j<nPlayer; j++) {
 					Card card =  _deck.getNextCard();
 					_infoCenter.addPlayerHand(_players.get(j), card);
 					if (card.getSuit() == Card.SPADE && card.getRank() == 3) {
 						firstPlayer = _players.get(j);
 					}
+					cardNumber++;
+					if(cardNumber==54) {
+						break;
+					}
 				}
 			}
 			_players.remove(firstPlayer);
 			_players.add(0, firstPlayer);
+			_infoCenter.setPlayerIsLeader(firstPlayer);
+			_infoCenter.setPlayerIsLastPlayer(firstPlayer);
 		} else {
-			for(int i=0; i<54; i++) {
+			int cardNumber = 0;
+			while(cardNumber<54) {
 				for(int j=0; j<nPlayer; j++) {
 					Card card =  _deck.getNextCard();
 					_infoCenter.addPlayerHand(_players.get(j), card);
+					cardNumber++;
+					if(cardNumber==54) {
+						break;
+					}
 				}
 			}
 			int insertedNumb = 0;
@@ -159,6 +225,8 @@ public class Daifugo {
 			}
 			_players.remove(firstPlayer);
 			_players.add(insertedNumb, firstPlayer);
+			_infoCenter.setPlayerIsLeader(firstPlayer);
+			_infoCenter.setPlayerIsLastPlayer(firstPlayer);
 			insertedNumb += 1;
 
 			while (insertedNumb != nPlayer) {
@@ -182,14 +250,19 @@ class InfoCenter {
 	ArrayList<Integer> scores;
 	ArrayList<Boolean> isLeader;
 	ArrayList<Boolean> isLastPlayer;
+	ArrayList<Boolean> playerNoHand;
 	ArrayList<ArrayList<Card>> playerHand;
 	ArrayList<Byte> playerStatus;
+	ArrayList<Integer> rewards;
+	ArrayList<Byte> status;
 	boolean firstGame;
+	int currentIndex_r;
+	int currentIndex_s;
 	public static final byte GRAND_MILLIONAIRE = 1;
 	public static final byte MILLIONAIRE = 2;
 	public static final byte COMMONER = 3;
 	public static final byte NEEDY = 4;
-	public static final byte  EXTREME_NEEDY = 5;
+	public static final byte EXTREME_NEEDY = 5;
 
 	public InfoCenter(ArrayList<Player> _players) {
 		this.players = new ArrayList<Player>();
@@ -198,7 +271,12 @@ class InfoCenter {
 		this.isLastPlayer = new ArrayList<Boolean>();
 		this.playerHand = new ArrayList<ArrayList<Card>>();
 		this.playerStatus = new ArrayList<Byte>();
+		this.playerNoHand = new ArrayList<Boolean>();
+		this.rewards = new ArrayList<Integer>();
+		this.status = new ArrayList<Byte>();
 		this.firstGame = true;
+		this.currentIndex_r = 0;
+		this.currentIndex_s = 0;
 		// 
 		// !!! should not change the player order in InfoCenter's ArrayList !!!
 		// 
@@ -207,9 +285,93 @@ class InfoCenter {
 			this.scores.add(0);
 			this.isLeader.add(false);
 			this.isLastPlayer.add(false);
+			this.playerNoHand.add(false);
 			this.playerHand.add(new ArrayList<Card>());
 			this.playerStatus.add(this.COMMONER);
-		}		
+		}
+		this.rewardsSetting(_players.size());
+		this.statusSetting(_players.size());		
+	}
+
+	public int getScore() {
+		return this.rewards.get(currentIndex_r++);
+	}
+
+	public int getScore(int index) {
+		return this.rewards.get(index);
+	}
+
+	public byte getStatus() {
+		return this.status.get(currentIndex_s++);
+	}
+
+	public byte getStatus(int index) {
+		return this.status.get(index);
+	}
+
+	public void statusSetting(int nPlayer) {
+		if(nPlayer == 4) {
+			this.status.add(GRAND_MILLIONAIRE);
+			this.status.add(MILLIONAIRE);
+			this.status.add(NEEDY);
+			this.status.add(EXTREME_NEEDY);
+		} else if(nPlayer == 5) {
+			this.status.add(GRAND_MILLIONAIRE);
+			this.status.add(MILLIONAIRE);
+			this.status.add(COMMONER);
+			this.status.add(NEEDY);
+			this.status.add(EXTREME_NEEDY);
+		} else {
+			this.status.add(GRAND_MILLIONAIRE);
+			this.status.add(MILLIONAIRE);
+			this.status.add(COMMONER);
+			this.status.add(COMMONER);
+			this.status.add(NEEDY);
+			this.status.add(EXTREME_NEEDY);
+		}
+	}
+
+	public void rewardsSetting(int nPlayer) {
+		if(nPlayer == 4) {
+			this.rewards.add(2);
+			this.rewards.add(1);
+			this.rewards.add(-1);
+			this.rewards.add(-2);
+		} else if(nPlayer == 5) {
+			this.rewards.add(2);
+			this.rewards.add(1);
+			this.rewards.add(0);
+			this.rewards.add(-1);
+			this.rewards.add(-2);
+		} else {
+			this.rewards.add(2);
+			this.rewards.add(1);
+			this.rewards.add(0);
+			this.rewards.add(0);
+			this.rewards.add(-1);
+			this.rewards.add(-2);
+		}
+	}
+
+	public void startNewGame() {
+		this.currentIndex_r = 0;
+		this.currentIndex_s = 0;
+		for(int i=0; i<this.players.size(); i++) {
+			this.isLeader.set(i, false);
+			this.isLastPlayer.set(i, false);
+			this.playerNoHand.set(i, false);
+			this.playerHand.set(i, new ArrayList<Card>());
+		}	
+	}
+
+	public void setPlayerNoHand(Player _player, boolean status) {
+		int index = this.getPlayerIndex(_player);
+		this.playerNoHand.set(index, status);
+	}
+
+	public boolean getPlayerNoHand(Player _player) {
+		int index = this.getPlayerIndex(_player);
+		return this.playerNoHand.get(index);
 	}
 
 	public void setPlayerScore(Player _player, int point) {
@@ -222,9 +384,12 @@ class InfoCenter {
 		return this.scores.get(index);
 	}
 
-	public void setPlayerIsLeader(Player _player, boolean status) {
+	public void setPlayerIsLeader(Player _player) {
 		int index = this.getPlayerIndex(_player);
-		this.isLeader.set(index, status);
+		for(int i=0; i<this.players.size(); i++) {
+			this.isLeader.set(i, false);
+		}
+		this.isLeader.set(index, true);
 	}
 
 	public boolean getPlayerIsLeader(Player _player) {
@@ -232,9 +397,12 @@ class InfoCenter {
 		return this.isLeader.get(index);
 	}
 
-	public void setPlayerIsLastPlayer(Player _player, boolean status) {
+	public void setPlayerIsLastPlayer(Player _player) {
 		int index = this.getPlayerIndex(_player);
-		this.isLastPlayer.set(index, status);
+		for(int i=0; i<this.players.size(); i++) {
+			this.isLastPlayer.set(i, false);
+		}
+		this.isLastPlayer.set(index, true);
 	}
 
 	public boolean getPlayerIsLastPlayer(Player _player) {
@@ -302,6 +470,15 @@ class InfoCenter {
 		return this.players.indexOf(_player);
 	}
 
+	public int getPlayingNumber() {
+		int p = 0;
+		for(int i=0; i<this.players.size(); i++) {
+			if(this.playerNoHand.get(i)) {
+				p += 1;
+			}
+		}
+		return p;
+	}
 }
 
 
