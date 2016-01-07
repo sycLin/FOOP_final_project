@@ -16,7 +16,7 @@ public class Daifugo {
 	public static final byte MILLIONAIRE = 2;
 	public static final byte COMMONER = 3;
 	public static final byte NEEDY = 4;
-	public static final byte  EXTREME_NEEDY = 5;
+	public static final byte EXTREME_NEEDY = 5;
 	/**
 	 * main function for game execution flow
 	 * @param argv command-line arguments
@@ -25,6 +25,7 @@ public class Daifugo {
 		ArrayList<Player> players = new ArrayList<Player>();
 		Deck deck = new Deck();
 		InfoCenter infoCenter;
+		Hand currentHand = null;
 		// System.err.println("warning: main() not implemented.");
 		// 
 		// get init settings from user's input
@@ -59,7 +60,6 @@ public class Daifugo {
 							// 
 							// can't skip, do anything you want.
 							// 
-
 						} else if(infoCenter.getPlayerIsLeader(p) && !infoCenter.getPlayerIsLastPlayer(p)) {
 							// 
 							// can skip or play hand
@@ -94,13 +94,79 @@ public class Daifugo {
 								infoCenter.setPlayerIsLastPlayer(p);
 							}
 						}
+
+						if(infoCenter.getPlayerNoHand(p)) {
+							if(infoCenter.getPlayingNumber() == nPlayer) {
+								Player gm = infoCenter.getGrandMillionaire();
+								if(gm != null && gm != p) {
+									// 
+									// gm become EXTREME_NEEDY and no hand
+									// 
+									infoCenter.setPlayerStatus(gm, EXTREME_NEEDY);
+									infoCenter.setPlayerNoHand(gm);
+								} 
+							}
+							infoCenter.setPlayerStatus(p, infoCenter.getStatus());
+						}
+
 					}
 				}
 			}
+			infoCenter.playersGetStatusScore();
 		}
 		System.out.println("===========================");
 	}
 
+	// 
+	// if return false force player to skip this trick
+	//
+	/* 
+	public static boolean getAndCheckHand(Player _player, Hand _currentHand) {
+		boolean success = false;
+		int chance = 5;
+		ArrayList<Card> playedHand;
+		Hand challenger;
+		if(_currentHand == null) {
+			while(!success) {
+				try {
+					// 
+					// player getHand function have not implemented yet
+					// 
+					
+					playedHand = _player.getHand(_currentHand);
+					_currentHand = new Hand(playedHand);
+					if(_currentHand.type == Hand.UNKNOWN) {
+						success = false;
+						System.out.println("Wrong Hand! Try again.");
+					} else {
+						success = true;
+					}
+				} catch(Exception e) {
+					System.out.println("Something Wrong.");
+				}
+			}
+		} else {
+			while(chance--) {
+				try {
+					playedHand = _player.getHand(_currentHand);
+					challenger = new Hand(playedHand);
+					if (_currentHand.beats(challenger)) {
+						success = true;
+						break;
+					} else if(_currentHand.type == Hand.UNKNOWN) {
+						success = false;
+						System.out.println("Wrong Hand! Try again. You have "+chance+" time to try.");
+					} else {
+						success = false;
+						System.out.println("Can't beat current hand! Try again. You have "+chance+" time to try.");
+					}
+				} catch(Exception e) {
+					System.out.println("Something Wrong.");
+				}
+			}
+		}
+	}
+	*/
 	public static void getInitSetting() {
 		String inputInfo;
 		Scanner input = new Scanner(System.in);
@@ -364,19 +430,43 @@ class InfoCenter {
 		}	
 	}
 
-	public void setPlayerNoHand(Player _player, boolean status) {
+	public Player getGrandMillionaire() {
+		int i;
+		for(i=0; i<this.players.size(); i++) {
+			if(this.playerStatus.get(i) == GRAND_MILLIONAIRE) {
+				break;
+			}
+		}
+		if(i == this.players.size()) {
+			return null;
+		} else {
+			return this.players.get(i);
+		}
+	}
+
+	public void setPlayerNoHand(Player _player) {
 		int index = this.getPlayerIndex(_player);
-		this.playerNoHand.set(index, status);
+		this.playerHand.set(index, new ArrayList<Card>());
 	}
 
 	public boolean getPlayerNoHand(Player _player) {
 		int index = this.getPlayerIndex(_player);
+		if(this.playerHand.get(index).size()==0) {
+			this.playerNoHand.set(index, true); 
+		} else {
+			this.playerNoHand.set(index, false);
+		}
 		return this.playerNoHand.get(index);
 	}
 
-	public void setPlayerScore(Player _player, int point) {
+	public void changePlayerScore(Player _player, int point) {
 		int index = this.getPlayerIndex(_player);
 		this.scores.set(index, this.getPlayerScore(_player) + point);
+		if(point >= 0) {
+			_player.win_points(point);
+		} else {
+			_player.lose_points(point);
+		}
 	}
 
 	public int getPlayerScore(Player _player) {
@@ -436,19 +526,19 @@ class InfoCenter {
 			Player _player = this.players.get(i);
 			switch (this.getPlayerStatus(_player)) {
 				case GRAND_MILLIONAIRE:
-					this.setPlayerScore(_player, 2);
+					this.changePlayerScore(_player, 2);
 					break;
 				case MILLIONAIRE:
-					this.setPlayerScore(_player, 1);
+					this.changePlayerScore(_player, 1);
 					break;
 				case COMMONER:
-					this.setPlayerScore(_player, 0);
+					this.changePlayerScore(_player, 0);
 					break;
 				case NEEDY:
-					this.setPlayerScore(_player, -1);
+					this.changePlayerScore(_player, -1);
 					break;
 				case EXTREME_NEEDY:
-					this.setPlayerScore(_player, -2);
+					this.changePlayerScore(_player, -2);
 					break;
 				default:
 					break;
