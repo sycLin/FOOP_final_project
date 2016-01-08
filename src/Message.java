@@ -53,6 +53,11 @@ class Message {
 	 */
 	boolean isUnderJackBack;
 
+	/**
+	 * whether it's a new trick
+	 */
+	boolean isNewTrick;
+
 
 	// ----- actions ----- //
 
