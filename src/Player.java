@@ -64,5 +64,5 @@ public abstract class Player {
 	// ----- abstract methods ----- //
 
 	public abstract ArrayList<Card> play_card(ArrayList<Card> myCards);
-	public abstract void print_message(Message msg);
+	public abstract void update_info(Message msg);
 }
