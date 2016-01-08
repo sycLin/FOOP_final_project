@@ -58,6 +58,10 @@ class Message {
 	 */
 	boolean isNewTrick;
 
+	/**
+	 * whether it's tight
+	 */
+	boolean isTight;
 
 	// ----- actions ----- //
 
