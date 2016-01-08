@@ -38,6 +38,7 @@ public class Daifugo {
 		infoCenter = new InfoCenter(players);
 
 		for(int r=0; r<nRounds; r++) {
+			int trick = 0;
 			System.out.println("=========="+"Round "+(r+1)+"==========");
 			startNewGame(infoCenter, deck, players);
 
@@ -50,6 +51,7 @@ public class Daifugo {
 				}
 				System.out.println();
 			}
+			System.out.println(infoCenter.getPlayingNumber());
 
 			while(infoCenter.getPlayingNumber() > 0) {
 				int skipNumber = 0;
@@ -59,7 +61,8 @@ public class Daifugo {
 						if(infoCenter.getPlayerIsLeader(p) && infoCenter.getPlayerIsLastPlayer(p)) {
 							// 
 							// can't skip, do anything you want.
-							// 
+							//
+							System.out.println("-------"+"Tricks "+(++trick)+"-------"); 
 						} else if(infoCenter.getPlayerIsLeader(p) && !infoCenter.getPlayerIsLastPlayer(p)) {
 							// 
 							// can skip or play hand
@@ -74,6 +77,7 @@ public class Daifugo {
 							// 
 							// become leader, can't skip, do anythings you want
 							// 
+							System.out.println("-------"+"Tricks "+(++trick)+"-------");
 							infoCenter.setPlayerIsLeader(p);
 
 						} else if(!infoCenter.getPlayerIsLeader(p) && !infoCenter.getPlayerIsLastPlayer(p) &&
@@ -108,7 +112,11 @@ public class Daifugo {
 							}
 							infoCenter.setPlayerStatus(p, infoCenter.getStatus());
 						}
-
+						if(infoCenter.getPlayingNumber() == 1) {
+							Player lastPlayer = infoCenter.getLastPlayer();
+							infoCenter.setPlayerNoHand(lastPlayer);
+							infoCenter.setPlayerStatus(lastPlayer, infoCenter.getStatus());
+						}
 					}
 				}
 			}
@@ -167,6 +175,10 @@ public class Daifugo {
 		}
 	}
 	*/
+
+	/**
+	 * to get inital settings' infomation from input
+	 */
 	public static void getInitSetting() {
 		String inputInfo;
 		Scanner input = new Scanner(System.in);
@@ -221,6 +233,10 @@ public class Daifugo {
 		nAIPlayer = nPlayer - nHumanPlayer;
 	}
 
+	/**
+	 * to set inital settings' infomation
+	 * @param players players in ArrayList of Player
+	 */
 	public static void setInitSetting(ArrayList<Player> players) {
 		// 
 		// adding players to the game
@@ -236,6 +252,12 @@ public class Daifugo {
  		Collections.shuffle(players);
 	}
 
+	/**
+	 * to init new game setting for each round
+	 * @param _infoCenter InforCenter's reference
+	 * @param _deck 	  Deck's reference
+	 * @param _players 	  Arraylist of Player's reference
+	 */
 	public static void startNewGame(InfoCenter _infoCenter, Deck _deck, ArrayList<Player> _players) {
 		_infoCenter.startNewGame();
 		// 
@@ -330,6 +352,10 @@ class InfoCenter {
 	public static final byte NEEDY = 4;
 	public static final byte EXTREME_NEEDY = 5;
 
+	/**
+	 * Constructor of InfoCenter, init player's settings
+	 * @param _players players in ArrayList of Player 
+	 */
 	public InfoCenter(ArrayList<Player> _players) {
 		this.players = new ArrayList<Player>();
 		this.scores = new ArrayList<Integer>();
@@ -351,30 +377,52 @@ class InfoCenter {
 			this.scores.add(0);
 			this.isLeader.add(false);
 			this.isLastPlayer.add(false);
-			this.playerNoHand.add(false);
+			this.playerNoHand.add(true);
 			this.playerHand.add(new ArrayList<Card>());
 			this.playerStatus.add(this.COMMONER);
 		}
 		this.rewardsSetting(_players.size());
 		this.statusSetting(_players.size());		
-	}
+	}	
 
+	/**
+	 * to get score 
+	 * @return score in int
+	 */
 	public int getScore() {
 		return this.rewards.get(currentIndex_r++);
 	}
 
+	/**
+	 * to get score by given index
+	 * @param index score index
+	 * @return score in int
+	 */
 	public int getScore(int index) {
 		return this.rewards.get(index);
 	}
 
+	/**
+	 * to get status
+	 * @return status in byte
+	 */
 	public byte getStatus() {
 		return this.status.get(currentIndex_s++);
 	}
 
+	/**
+	 * to get status by given index
+	 * @param index status index
+	 * @return status in byte
+	 */
 	public byte getStatus(int index) {
 		return this.status.get(index);
 	}
 
+	/**
+	 * to init status setting
+	 * @param nPlayer total number of players in this game
+	 */
 	public void statusSetting(int nPlayer) {
 		if(nPlayer == 4) {
 			this.status.add(GRAND_MILLIONAIRE);
@@ -397,6 +445,10 @@ class InfoCenter {
 		}
 	}
 
+	/**
+	 * to init reward setting
+	 * @param nPlayer total number of players in this game
+	 */
 	public void rewardsSetting(int nPlayer) {
 		if(nPlayer == 4) {
 			this.rewards.add(2);
@@ -419,17 +471,42 @@ class InfoCenter {
 		}
 	}
 
+	/**
+	 * to init new game setting
+	 */
 	public void startNewGame() {
 		this.currentIndex_r = 0;
 		this.currentIndex_s = 0;
 		for(int i=0; i<this.players.size(); i++) {
 			this.isLeader.set(i, false);
 			this.isLastPlayer.set(i, false);
-			this.playerNoHand.set(i, false);
+			this.playerNoHand.set(i, true);
 			this.playerHand.set(i, new ArrayList<Card>());
 		}	
 	}
 
+	/**
+	 * to get the last player in the game
+	 * @return the last player
+	 */
+	public Player getLastPlayer() {
+		if(this.getPlayingNumber() == 1) {
+			int i;
+			for(i=0; i<this.players.size(); i++) {
+				if(!this.getPlayerNoHand(this.players.get(i))) {
+					break;
+				} 
+			}
+			return this.players.get(i);
+		} else {
+			return null;
+		}
+	}
+
+	/**
+	 * to get GRAND_MILLIONAIRE in players
+	 * @return player with GRAND_MILLIONAIRE status
+	 */
 	public Player getGrandMillionaire() {
 		int i;
 		for(i=0; i<this.players.size(); i++) {
@@ -444,11 +521,20 @@ class InfoCenter {
 		}
 	}
 
+	/**
+	 * to set player has no hand
+	 * @param _player player object
+	 */
 	public void setPlayerNoHand(Player _player) {
 		int index = this.getPlayerIndex(_player);
 		this.playerHand.set(index, new ArrayList<Card>());
 	}
 
+	/**
+	 * to get whether player has no hand
+	 * @param _player player object
+	 * @return if player has hand in boolean value
+	 */
 	public boolean getPlayerNoHand(Player _player) {
 		int index = this.getPlayerIndex(_player);
 		if(this.playerHand.get(index).size()==0) {
@@ -459,6 +545,11 @@ class InfoCenter {
 		return this.playerNoHand.get(index);
 	}
 
+	/**
+	 * to change player's socre
+	 * @param _player player object
+	 * @param point value to be set
+	 */
 	public void changePlayerScore(Player _player, int point) {
 		int index = this.getPlayerIndex(_player);
 		this.scores.set(index, this.getPlayerScore(_player) + point);
@@ -469,11 +560,20 @@ class InfoCenter {
 		}
 	}
 
+	/**
+	 * to get player's socre
+	 * @param _player player object
+	 * @return player's score
+	 */
 	public int getPlayerScore(Player _player) {
 		int index = this.getPlayerIndex(_player);
 		return this.scores.get(index);
 	}
 
+	/**
+	 * set player to be leader
+	 * @param _player player object
+	 */
 	public void setPlayerIsLeader(Player _player) {
 		int index = this.getPlayerIndex(_player);
 		for(int i=0; i<this.players.size(); i++) {
@@ -482,11 +582,20 @@ class InfoCenter {
 		this.isLeader.set(index, true);
 	}
 
+	/**
+	 * to get whether player is leader
+	 * @param _player player object
+	 * @return if player is leader in boolean value
+	 */
 	public boolean getPlayerIsLeader(Player _player) {
 		int index = this.getPlayerIndex(_player);
 		return this.isLeader.get(index);
 	}
 
+	/**
+	 * set player to be the last player
+	 * @param _player player object
+	 */
 	public void setPlayerIsLastPlayer(Player _player) {
 		int index = this.getPlayerIndex(_player);
 		for(int i=0; i<this.players.size(); i++) {
@@ -495,11 +604,21 @@ class InfoCenter {
 		this.isLastPlayer.set(index, true);
 	}
 
+	/**
+	 * to get whether player is the last player
+	 * @param _player player object
+	 * @return if player is the last player in boolean value
+	 */
 	public boolean getPlayerIsLastPlayer(Player _player) {
 		int index = this.getPlayerIndex(_player);
 		return this.isLastPlayer.get(index);
 	}
 
+	/**
+	 * to remove player's hand
+	 * @param _player player object
+	 * @param hand hand to be remove in ArrayList of Card
+	 */
 	public void removePlayerHand(Player _player, ArrayList<Card> hand) {
 		int index = this.getPlayerIndex(_player);
 		for(int i=0; i<hand.size(); i++) {
@@ -507,20 +626,39 @@ class InfoCenter {
 		}
 	}
 
+	/**
+	 * to set player hand
+	 * @param _player player object
+	 * @param hand hand to be set in ArrayList of Card
+	 */
 	public void setPlayerHand(Player _player, ArrayList<Card> hand) {
 		int index = this.getPlayerIndex(_player);
 		this.playerHand.set(index, hand);
 	}
+
+	/**
+	 * to get player's hand
+	 * @param _player player object
+	 * @return Player's hand in ArrayList of Card
+	 */
 	public ArrayList<Card> getPlayerHand(Player _player) {
 		int index = this.getPlayerIndex(_player);
 		return this.playerHand.get(index);
 	}
 
+	/**
+	 * to add card to player's hand
+	 * @param _player player object
+	 * @param _card card to be added
+	 */
 	public void addPlayerHand(Player _player, Card _card) {
 		int index = this.getPlayerIndex(_player);
 		this.playerHand.get(index).add(_card);
 	}
 
+	/**
+	 * Players get their socres by current status
+	 */
 	public void playersGetStatusScore() {
 		for(int i=0; i<this.players.size(); i++) {
 			Player _player = this.players.get(i);
@@ -546,24 +684,43 @@ class InfoCenter {
 		}
 	}
 
+	/**
+	 * to set player current status
+	 * @param _player player object
+	 * @param status player's status to be set
+	 */
 	public void setPlayerStatus(Player _player, byte status) {
 		int index = this.getPlayerIndex(_player);
 		this.playerStatus.set(index, status);
 	}
 
+	/**
+	 * to get player current status
+	 * @param _player player object
+	 * @return the player status in byte
+	 */
 	public byte getPlayerStatus(Player _player) {
 		int index = this.getPlayerIndex(_player);
 		return this.playerStatus.get(index);
 	}
 
+	/**
+	 * to get player index in InforCenter by input player object
+	 * @param _player player object
+	 * @return the index of input player in InfoCenter
+	 */
 	public int getPlayerIndex(Player _player) {
 		return this.players.indexOf(_player);
 	}
 
+	/**
+	 * to get the number of playing players
+	 * @return number of playing players 
+	 */
 	public int getPlayingNumber() {
 		int p = 0;
 		for(int i=0; i<this.players.size(); i++) {
-			if(this.playerNoHand.get(i)) {
+			if(!this.getPlayerNoHand(this.players.get(i))) {
 				p += 1;
 			}
 		}
