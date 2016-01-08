@@ -43,6 +43,17 @@ class Message {
 	 */
 	boolean[] playerStatus;
 
+	/**
+	 * whether it's under revolution
+	 */
+	boolean isUnderRevolution;
+
+	/**
+	 * whether it's under jackBack
+	 */
+	boolean isUnderJackBack;
+
+
 	// ----- actions ----- //
 
 	/**
