@@ -117,4 +117,12 @@ class Hand {
 	public ArrayList<Card> getContent() {
 		return this.content;
 	}
+
+	public boolean isTight(Hand another_hand) {
+
+	}
+
+	public int numberOfThis(int rank) {
+
+	}
 }
