@@ -5,9 +5,9 @@ import java.util.*;
 public class Daifugo {
 
 	// fields
-	private ArrayList<Player> players;
-	private boolean isUnderJackBack;
-	private boolean isUnderRevolution;
+	private static boolean isUnderJackBack;
+	private static boolean isUnderRevolution;
+	private static boolean isTight;
 	private static int nPlayer;
 	private static int nHumanPlayer;
 	private static int nAIPlayer;
@@ -39,6 +39,10 @@ public class Daifugo {
 
 		for(int r=0; r<nRounds; r++) {
 			int trick = 0;
+			isUnderJackBack = false;
+			isUnderRevolution = false;
+			isTight = false;
+
 			System.out.println("=========="+"Round "+(r+1)+"==========");
 			startNewGame(infoCenter, deck, players);
 
