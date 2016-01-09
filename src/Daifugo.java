@@ -81,7 +81,7 @@ public class Daifugo {
 							isTight = false;
 							isUnderJackBack = false;
 							getAndCheckHand(infoCenter, players, p, currentHand);
-							
+
 						} else if(infoCenter.getPlayerIsLeader(p) && !infoCenter.getPlayerIsLastPlayer(p)) {
 							// 
 							// can skip or play hand
@@ -834,6 +834,11 @@ class InfoCenter {
 		return this.players.indexOf(_player);
 	}
 
+	/**
+	 * to get whether player is still playing
+	 * @param _player player object
+	 * @return if player is still playing
+	 */
 	public boolean getPlayerIsPlaying(Player _player) {
 		if(!this.getPlayerNoHand(_player)) {
 			return true;
