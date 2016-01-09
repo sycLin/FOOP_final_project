@@ -76,8 +76,8 @@ class Message {
 	 * to construct a message to inform player of his/her erroneus move
 	 * @param errMsg the error message
 	 */
-	public Message(errMsg) {
-		;
+	public Message(byte errMsg) {
+		this.type = errMsg;
 	}
 
 }
