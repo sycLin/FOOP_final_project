@@ -27,6 +27,8 @@ public class Daifugo {
 		Deck deck = new Deck();
 		InfoCenter infoCenter;
 		Hand currentHand = null;
+		int skipNumber = 0;
+		int skipCardNumber = 0;
 		msg = new Message(Message.BASIC);
 		// System.err.println("warning: main() not implemented.");
 		// 
@@ -60,17 +62,26 @@ public class Daifugo {
 			System.out.println(infoCenter.getPlayingNumber());
 
 			while(infoCenter.getPlayingNumber() > 0) {
-				int skipNumber = 0;
 				for(int i=0; i<nPlayer; i++) {
 					Player p = players.get(i);
 					if(!infoCenter.getPlayerNoHand(p)) {
+						if(skipCardNumber > 0) {
+							skipCardNumber--;
+							continue;
+						}
 						if(infoCenter.getPlayerIsLeader(p) && infoCenter.getPlayerIsLastPlayer(p)) {
 							// 
 							// can't skip, do anything you want.
 							//
 							System.out.println("-------"+"Tricks "+(++trick)+"-------");
+							skipNumber = 0;
 							msg.isNewTrick = true;
+							msg.isTight = false;
 							msg.isUnderJackBack = false; 
+							isTight = false;
+							isUnderJackBack = false;
+							getAndCheckHand(infoCenter, players, p, currentHand);
+
 						} else if(infoCenter.getPlayerIsLeader(p) && !infoCenter.getPlayerIsLastPlayer(p)) {
 							// 
 							// can skip or play hand
@@ -80,6 +91,10 @@ public class Daifugo {
 								skipNumber++;
 							} else {
 								infoCenter.setPlayerIsLastPlayer(p);
+								skipCardNumber = getAndCheckHand(infoCenter, players, p, currentHand);
+								if(skipCardNumber == -1) {
+									skipNumber++;
+								} 
 							}
 
 						} else if(!infoCenter.getPlayerIsLeader(p) && infoCenter.getPlayerIsLastPlayer(p)) {
@@ -87,9 +102,14 @@ public class Daifugo {
 							// become leader, can't skip, do anythings you want
 							// 
 							System.out.println("-------"+"Tricks "+(++trick)+"-------");
+							skipNumber = 0;
 							msg.isNewTrick = true;
+							msg.isTight = false;
 							msg.isUnderJackBack = false;
+							isTight = false;
+							isUnderJackBack = false;
 							infoCenter.setPlayerIsLeader(p);
+							getAndCheckHand(infoCenter, players, p, currentHand);
 
 						} else if(!infoCenter.getPlayerIsLeader(p) && !infoCenter.getPlayerIsLastPlayer(p) &&
 									infoCenter.getPlayingNumber() == skipNumber) {
@@ -97,10 +117,15 @@ public class Daifugo {
 							// become leader and the last player, can't skip, do anythings you want
 							// 
 							System.out.println("-------"+"Tricks "+(++trick)+"-------");
+							skipNumber = 0;
 							msg.isNewTrick = true;
+							msg.isTight = false;
 							msg.isUnderJackBack = false;
+							isTight = false;
+							isUnderJackBack = false;
 							infoCenter.setPlayerIsLeader(p);
 							infoCenter.setPlayerIsLastPlayer(p);
+							getAndCheckHand(infoCenter, players, p, currentHand);
 
 						} else {
 							// 
@@ -111,6 +136,10 @@ public class Daifugo {
 								skipNumber++;
 							} else {
 								infoCenter.setPlayerIsLastPlayer(p);
+								skipCardNumber = getAndCheckHand(infoCenter, players, p, currentHand);
+								if(skipCardNumber == -1) {
+									skipNumber++;
+								} 
 							}
 						}
 
@@ -141,15 +170,30 @@ public class Daifugo {
 	}
 
 	public static int judge(InfoCenter _infoCenter, ArrayList<Player> _players, Player _player, Hand lastHand, Hand newHand) {
+		int skipNumb = 0;
 		if(!msg.isNewTrick) {
-			if(lastHand.getType() == lastHand.getType()) {
-
+			if(lastHand.isTight(newHand)) {
+				isTight = true;
 			}
 		} else {
 			if(newHand.getType() == Hand.STRAIGHT_FLUSH) {
-
+				isUnderRevolution = !isUnderRevolution;
 			}
 		}
+		return skipNumb;
+	}
+
+	public static boolean canBeat(boolean beats, Hand lastHand, Hand newHand) {
+		boolean truth = beats;
+		if(lastHand.getType() == newHand.getType()) {
+			if(isUnderRevolution) {
+				truth = !truth;
+			}
+			if(isUnderJackBack) {
+				truth = !truth;
+			}
+		}
+		return truth;
 	}
 
 	// 
@@ -174,8 +218,10 @@ public class Daifugo {
 						System.out.println("Wrong Hand! Try again.");
 					} else {
 						_infoCenter.removePlayerHand(_player, playHand.getContent());
+						skipNumb = judge(_infoCenter, _players, _player, _currentHand, playHand);
 						setMessage(_infoCenter, _players, _player, _currentHand, Message.BASIC);
 						success = true;
+						_currentHand = playHand;
 					}
 				} catch(Exception e) {
 					System.out.println("Something Wrong.");
@@ -187,17 +233,21 @@ public class Daifugo {
 					_player.update_info(msg);
 					playCard = _player.play_card(_infoCenter.getPlayerHand(_player));
 					playHand = new Hand(playCard);
-					if (_currentHand.beats(playHand)) {
-						success = true;
+					if (canBeat(_currentHand.beats(playHand), _currentHand, playHand)) {
 						_infoCenter.removePlayerHand(_player, playHand.getContent());
+						skipNumb = judge(_infoCenter, _players, _player, _currentHand, playHand);
 						setMessage(_infoCenter, _players, _player, _currentHand, Message.BASIC);
+						success = true;
+						_currentHand = playHand;
 						break;
 					} else if(_currentHand.getType() == Hand.UNKNOWN) {
 						success = false;
+						skipNumb = -1;
 						setMessage(_infoCenter, _players, _player, _currentHand, Message.ERROR);
 						System.out.println("Wrong Hand! Try again. You have "+chance+" time to try.");
 					} else {
 						success = false;
+						skipNumb = -1;
 						setMessage(_infoCenter, _players, _player, _currentHand, Message.ERROR);
 						System.out.println("Can't beat current hand! Try again. You have "+chance+" time to try.");
 					}
@@ -207,6 +257,7 @@ public class Daifugo {
 			}
 			setMessage(_infoCenter, _players, _player, _currentHand, Message.BASIC);
 		}
+		return skipNumb;
 	}
 
 	public static void setMessage(InfoCenter _infoCenter, ArrayList<Player> _players, Player _player, Hand _currentHand, byte _type) {
@@ -783,6 +834,11 @@ class InfoCenter {
 		return this.players.indexOf(_player);
 	}
 
+	/**
+	 * to get whether player is still playing
+	 * @param _player player object
+	 * @return if player is still playing
+	 */
 	public boolean getPlayerIsPlaying(Player _player) {
 		if(!this.getPlayerNoHand(_player)) {
 			return true;
