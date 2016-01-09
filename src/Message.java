@@ -77,7 +77,7 @@ class Message {
 	 * @param errMsg the error message
 	 */
 	public Message(byte errMsg) {
-		;
+		this.type = errMsg;
 	}
 
 }

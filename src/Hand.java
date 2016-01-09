@@ -113,4 +113,8 @@ class Hand {
 		}
 		return ret;
 	}
+
+	public ArrayList<Card> getContent() {
+		return this.content;
+	}
 }
