@@ -3,6 +3,7 @@ import java.lang.*;
 import java.util.*;
 
 public abstract class Player {
+
 	// ----- fields ----- //
 
 	/**
@@ -16,7 +17,9 @@ public abstract class Player {
 	public static final byte NEEDY = 4;
 	public static final byte EXTREME_NEEDY = 5;
 	private byte title;
-	
+	Player() {
+		point = 0;	
+	}
 
 	// ----- actions ----- //
 
@@ -64,5 +67,9 @@ public abstract class Player {
 	// ----- abstract methods ----- //
 
 	public abstract ArrayList<Card> play_card(ArrayList<Card> myCards);
+	/**
+	 *	Give up number cards (7 or 10)
+	 */
+	public abstract ArrayList<Card> give_up_card(ArrayList<Card> myCards, int number);
 	public abstract void update_info(Message msg);
 }
