@@ -122,7 +122,4 @@ class Hand {
 
 	}
 
-	public int numberOfThis(int rank) {
-
-	}
 }
