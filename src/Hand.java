@@ -114,15 +114,29 @@ class Hand {
 		return ret;
 	}
 
+	/**
+	 * to get the content of this hand
+	 * @return the content
+	 */
 	public ArrayList<Card> getContent() {
 		return this.content;
 	}
 
+	/**
+	 * to know if tight with the given hand
+	 * @param another_hand the given hand
+	 * @return true if tight; false, otherwise.
+	 */
 	public boolean isTight(Hand another_hand) {
-
+		;
 	}
 
-	public int numberOfThis(int rank) {
-
+	/**
+	 * to get all the effects this hand has
+	 * @return array of integers indicating the count of a specific effect.
+	 */
+	public int[] getEffects() {
+		;
 	}
+
 }
