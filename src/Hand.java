@@ -119,7 +119,11 @@ class Hand {
 	}
 
 	public boolean isTight(Hand another_hand) {
+		;
+	}
 
+	public int[] getEffects() {
+		;
 	}
 
 }
