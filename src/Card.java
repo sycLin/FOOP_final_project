@@ -5,6 +5,7 @@ import java.util.*;
 final class Card implements Comparable<Card> {
 	
 	// ----- constants ----- //
+
 	public static final byte CLUB = 4;
 	public static final byte DIAMOND = 3;
 	public static final byte HEART = 2;
@@ -56,6 +57,10 @@ final class Card implements Comparable<Card> {
 		// handle normal cases
 		if(getRank() > another_card.getRank()) return 1;
 		if(getRank() < another_card.getRank()) return -1;
+		else {
+			if (getSuit() > another_card.getSuit()) return 1;
+			if (getSuit() < another_card.getSuit()) return -1;
+		}
 		return 0;
 	}
 
@@ -103,6 +108,6 @@ final class Card implements Comparable<Card> {
 			default:
 				ret += rank;
 		}
-		return ret+"]";
+		return ret + "]";
 	}
 }
