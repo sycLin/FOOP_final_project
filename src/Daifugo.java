@@ -171,6 +171,8 @@ public class Daifugo {
 
 	public static int judge(InfoCenter _infoCenter, ArrayList<Player> _players, Player _player, Hand lastHand, Hand newHand) {
 		int skipNumb = 0;
+		int[] effects = newHand.getEffects();
+
 		if(!msg.isNewTrick) {
 			if(lastHand.isTight(newHand)) {
 				isTight = true;
@@ -178,6 +180,11 @@ public class Daifugo {
 		} else {
 			if(newHand.getType() == Hand.STRAIGHT_FLUSH) {
 				isUnderRevolution = !isUnderRevolution;
+			}
+			for(int i=0; i<effects.length; i++) {
+				if(i+1 == 5 && ) {
+
+				} else 
 			}
 		}
 		return skipNumb;
@@ -187,6 +194,8 @@ public class Daifugo {
 		boolean truth = beats;
 		if(lastHand.getType() == newHand.getType() && lastHand.getType() == Hand.SINGLE && 
 			(newHand.getContent().get(0).getRank() == 3 && newHand.getContent().get(0).getSuit()==Card.SPADE && lastHand.getContent().get(0).getSuit()==Card.JOKER)) {
+			;
+		} else if(beats && newHand.hasJoker()) {
 			;
 		} else if(lastHand.getType() == newHand.getType()) {
 			if(isUnderRevolution) {
@@ -348,11 +357,11 @@ public class Daifugo {
 		// 
 		for(int i=0; i<nHumanPlayer; i++) {
 			// players.add(new HumanPlayer());
-			players.add(new Player());
+			players.add(new HumanPlayer());
 		}
 		for(int i=0; i<nAIPlayer; i++) {
 			// players.add(new AIPlayer());
-			players.add(new Player());
+			players.add(new AIPlayer());
 		}
 	}
 
