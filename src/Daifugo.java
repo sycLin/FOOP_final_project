@@ -185,13 +185,18 @@ public class Daifugo {
 
 	public static boolean canBeat(boolean beats, Hand lastHand, Hand newHand) {
 		boolean truth = beats;
-		if(lastHand.getType() == newHand.getType()) {
+		if(lastHand.getType() == newHand.getType() && lastHand.getType() == Hand.SINGLE && 
+			(newHand.getContent().get(0).getRank() == 3 && newHand.getContent().get(0).getSuit()==Card.SPADE && lastHand.getContent().get(0).getSuit()==Card.JOKER)) {
+			;
+		} else if(lastHand.getType() == newHand.getType()) {
 			if(isUnderRevolution) {
 				truth = !truth;
 			}
 			if(isUnderJackBack) {
 				truth = !truth;
 			}
+		} else {
+			;
 		}
 		return truth;
 	}
@@ -203,15 +208,13 @@ public class Daifugo {
 		boolean success = false;
 		int chance = 5;
 		int skipNumb = 0;
-		ArrayList<Card> playCard;
 		Hand playHand;
 		setMessage(_infoCenter, _players, _player, _currentHand, Message.BASIC);
 		if(_currentHand == null) {
 			while(!success) {
 				try {
 					_player.update_info(msg);
-					playCard = _player.play_card(_infoCenter.getPlayerHand(_player));
-					playHand = new Hand(playCard);
+					playHand = _player.play_card(_infoCenter.getPlayerHand(_player));
 					if(playHand.getType() == Hand.UNKNOWN) {
 						success = false;
 						setMessage(_infoCenter, _players, _player, _currentHand, Message.ERROR);
@@ -231,8 +234,7 @@ public class Daifugo {
 			while(chance-- > 0) {
 				try {
 					_player.update_info(msg);
-					playCard = _player.play_card(_infoCenter.getPlayerHand(_player));
-					playHand = new Hand(playCard);
+					playHand = _player.play_card(_infoCenter.getPlayerHand(_player));
 					if (canBeat(_currentHand.beats(playHand), _currentHand, playHand)) {
 						_infoCenter.removePlayerHand(_player, playHand.getContent());
 						skipNumb = judge(_infoCenter, _players, _player, _currentHand, playHand);
