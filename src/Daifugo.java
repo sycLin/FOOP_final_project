@@ -13,11 +13,6 @@ public class Daifugo {
 	private static int nAIPlayer;
 	private static int nRounds;
 	public static Message msg;
-	public static final byte GRAND_MILLIONAIRE = 1;
-	public static final byte MILLIONAIRE = 2;
-	public static final byte COMMONER = 3;
-	public static final byte NEEDY = 4;
-	public static final byte EXTREME_NEEDY = 5;
 	/**
 	 * main function for game execution flow
 	 * @param argv command-line arguments
@@ -153,7 +148,7 @@ public class Daifugo {
 									// 
 									// gm become EXTREME_NEEDY and no hand
 									// 
-									infoCenter.setPlayerStatus(gm, EXTREME_NEEDY);
+									infoCenter.setPlayerStatus(gm, InfoCenter.EXTREME_NEEDY);
 									infoCenter.setPlayerNoHand(gm);
 								} 
 							}
@@ -170,6 +165,7 @@ public class Daifugo {
 			infoCenter.playersGetStatusScore();
 		}
 		System.out.println("===========================");
+		infoCenter.printResult();
 	}
 
 	/**
@@ -311,7 +307,7 @@ public class Daifugo {
 				try {
 					_player.update_info(msg);
 					playHand = _player.play_card(_infoCenter.getPlayerHand(_player));
-					if (canBeat(_currentHand.beats(playHand), _currentHand, playHand)) {
+					if (canBeat(_currentHand.beats(playHand), _currentHand, playHand) && _infoCenter.getPlayerHasThisHand(_player, playHand.getContent())) {
 						_infoCenter.removePlayerHand(_player, playHand.getContent());
 						effectNumber = judge(_infoCenter, _players, _player, _currentHand, playHand);
 						setMessage(_infoCenter, _players, _player, _currentHand, Message.BASIC);
@@ -438,11 +434,15 @@ public class Daifugo {
 			// players.add(new AIPlayer());
 			players.add(new AIPlayer());
 		}
+
+		for(int i=0; i<nPlayer; i++) {
+			players.get(i).enter_name();
+		}
 	}
 
 	/**
 	 * to init new game setting for each round
-	 * @param _infoCenter InforCenter's reference
+	 * @param _infoCenter InfoCenter's reference
 	 * @param _deck 	  Deck's reference
 	 * @param _players 	  ArrayList of Player's reference
 	 */
@@ -944,7 +944,7 @@ class InfoCenter {
 	}
 
 	/**
-	 * to get player index in InforCenter by input player object
+	 * to get player index in InfoCenter by input player object
 	 * @param _player player object
 	 * @return the index of input player in InfoCenter
 	 */
@@ -977,6 +977,14 @@ class InfoCenter {
 			}
 		}
 		return p;
+	}
+
+	public void printResult() {
+		for(int i=0; i<this.players.size(); i++) {
+			Player p = this.players.get(i);
+			System.out.println(p.get_name()+" has "+this.scores.get(i)+" points.");
+		}
+		System.out.println("===========================");
 	}
 }
 

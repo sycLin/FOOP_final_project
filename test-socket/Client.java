@@ -21,18 +21,34 @@ public class Client {
 				input = new DataInputStream(socket.getInputStream());
 				output = new DataOutputStream(socket.getOutputStream());
 				while(true) {
-					System.out.println(input.readUTF());
-					break;
+					try {
+						// show the message from server on screen
+						System.out.println(input.readUTF());
+						// get user input and send it to server
+						output.writeUTF(consoleInput.nextLine());
+					} catch(Exception e1) {
+						// nothing coming in from server-end
+						// sleep half a second to prevent from polling
+						try {
+							Thread.sleep(500);
+						} catch(Exception e3) {
+							// cannot sleep
+							continue;
+						}
+					}
 				}
 			} catch(IOException e) {
+				// something wrong with DataInputStream or DataOutputStream
 				e.printStackTrace();
 			} finally {
+				// close those things that should be closed
 				if(input != null)
 					input.close();
 				if(output != null)
 					output.close();
 			}
 		} catch(IOException e) {
+			// error occurrs when creating socket
 			e.printStackTrace();
 		} finally {
 			if(socket != null) {
