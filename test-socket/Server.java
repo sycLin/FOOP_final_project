@@ -54,9 +54,18 @@ public class Server {
 			try {
 				input = new DataInputStream(this.clientSocket.getInputStream());
 				output = new DataOutputStream(this.clientSocket.getOutputStream());
+				output.writeUTF(String.format("Hi, %s!\n", clientSocket.getRemoteSocketAddress()));
+				int counter = 0;
 				while(true) {
-					output.writeUTF(String.format("Hi, %s!\n", clientSocket.getRemoteSocketAddress()));
-					break;
+					output.writeUTF(String.format("This is the %d-th message for you from server XD. (waiting for your response...)", counter));
+					counter += 1;
+					try {
+						String res = input.readUTF();
+						System.out.println("Response from client: " + res);
+					} catch(Exception e) {
+						// cannot get response from client
+						break;
+					}
 				}
 			} catch(IOException e) {
 				e.printStackTrace();
