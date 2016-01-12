@@ -149,8 +149,14 @@ public class Daifugo {
 								} 
 							}
 						}
-
-						if(infoCenter.getPlayerNoHand(p) && effectNumber != -7 && effectNumber != -10) {
+						
+						if(effectNumber == -7 || effectNumber == -10) {
+							int playing = infoCenter.getPlayingNumber() - 1;
+							infoCenter.setPlayerNoHand(p);
+							infoCenter.setPlayerStatus(p, infoCenter.getStatus(playing));
+							setMessage(infoCenter, players, p, currentHand, Message.BASIC, -1);
+							updateInfo(players);
+						} else if(infoCenter.getPlayerNoHand(p)) {
 							if(infoCenter.getPlayingNumber() == nPlayer) {
 								Player gm = infoCenter.getGrandMillionaire();
 								if(gm != null && gm != p) {
@@ -164,7 +170,10 @@ public class Daifugo {
 							infoCenter.setPlayerStatus(p, infoCenter.getStatus());
 							setMessage(infoCenter, players, p, currentHand, Message.BASIC, -1);
 							updateInfo(players);
+						} else {
+							continue;
 						}
+
 						if(infoCenter.getPlayingNumber() == 1) {
 							Player lastPlayer = infoCenter.getLastPlayer();
 							infoCenter.setPlayerNoHand(lastPlayer);
@@ -241,12 +250,7 @@ public class Daifugo {
 				ArrayList<Card> giveCards = _player.give_up_card(_infoCenter.getPlayerHand(_player), effects.get("AbandonTen"));
 				int give = giveCards.size();
 				if(give != effects.get("AbandonTen")) {
-					int playing = _infoCenter.getPlayingNumber() - 1;
-					_infoCenter.setPlayerNoHand(_player);
-					_infoCenter.setPlayerStatus(_player, _infoCenter.getStatus(playing));
 					effectNumber = -10;
-					setMessage(_infoCenter, _players, _player, newHand, Message.BASIC, effectNumber);
-					updateInfo(_players);
 					return effectNumber;
 				} else {
 					_infoCenter.removePlayerHand(_player, giveCards);
