@@ -149,7 +149,7 @@ public class Daifugo {
 								} 
 							}
 						}
-						
+
 						if(effectNumber == -7 || effectNumber == -10) {
 							int playing = infoCenter.getPlayingNumber() - 1;
 							infoCenter.setPlayerNoHand(p);
@@ -171,7 +171,8 @@ public class Daifugo {
 							setMessage(infoCenter, players, p, currentHand, Message.BASIC, -1);
 							updateInfo(players);
 						} else {
-							continue;
+							setMessage(infoCenter, players, p, currentHand, Message.BASIC, effectNumber);
+							updateInfo(players);
 						}
 
 						if(infoCenter.getPlayingNumber() == 1) {
@@ -316,7 +317,6 @@ public class Daifugo {
 					} else {
 						_infoCenter.removePlayerHand(_player, playHand.getContent());
 						effectNumber = judge(_infoCenter, _players, _player, _currentHand, playHand);
-						setMessage(_infoCenter, _players, _player, _currentHand, Message.BASIC, effectNumber);
 						success = true;
 						_currentHand = playHand;
 					}
@@ -331,7 +331,6 @@ public class Daifugo {
 					if (canBeat(_currentHand.beats(playHand), _currentHand, playHand) && _infoCenter.getPlayerHasThisHand(_player, playHand.getContent())) {
 						_infoCenter.removePlayerHand(_player, playHand.getContent());
 						effectNumber = judge(_infoCenter, _players, _player, _currentHand, playHand);
-						setMessage(_infoCenter, _players, _player, _currentHand, Message.BASIC, effectNumber);
 						success = true;
 						_currentHand = playHand;
 						break;
@@ -352,10 +351,7 @@ public class Daifugo {
 					System.out.println("Something Wrong.");
 				}
 			}
-			setMessage(_infoCenter, _players, _player, _currentHand, Message.BASIC, effectNumber);
 		}
-		// update all player's info here
-		updateInfo(_players);
 		return effectNumber;
 	}
 
