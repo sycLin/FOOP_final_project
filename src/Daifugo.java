@@ -80,6 +80,7 @@ public class Daifugo {
 							msg.isUnderJackBack = false; 
 							isTight = false;
 							isUnderJackBack = false;
+							currentHand = null;
 							effectNumber = getAndCheckHand(infoCenter, players, p, currentHand);
 
 						} else if(infoCenter.getPlayerIsLeader(p) && !infoCenter.getPlayerIsLastPlayer(p)) {
@@ -108,6 +109,7 @@ public class Daifugo {
 							msg.isUnderJackBack = false;
 							isTight = false;
 							isUnderJackBack = false;
+							currentHand = null;
 							infoCenter.setPlayerIsLeader(p);
 							effectNumber = getAndCheckHand(infoCenter, players, p, currentHand);
 
@@ -123,6 +125,7 @@ public class Daifugo {
 							msg.isUnderJackBack = false;
 							isTight = false;
 							isUnderJackBack = false;
+							currentHand = null;
 							infoCenter.setPlayerIsLeader(p);
 							infoCenter.setPlayerIsLastPlayer(p);
 							effectNumber = getAndCheckHand(infoCenter, players, p, currentHand);
@@ -288,7 +291,7 @@ public class Daifugo {
 				try {
 					_player.update_info(msg);
 					playHand = _player.play_card(_infoCenter.getPlayerHand(_player));
-					if(playHand.getType() == Hand.UNKNOWN) {
+					if(playHand.getType() == Hand.UNKNOWN || !_infoCenter.getPlayerHasThisHand(_player, playHand.getContent())) {
 						success = false;
 						setMessage(_infoCenter, _players, _player, _currentHand, Message.ERROR);
 						System.out.println("Wrong Hand! Try again.");
@@ -315,7 +318,7 @@ public class Daifugo {
 						success = true;
 						_currentHand = playHand;
 						break;
-					} else if(_currentHand.getType() == Hand.UNKNOWN) {
+					} else if(_currentHand.getType() == Hand.UNKNOWN || !_infoCenter.getPlayerHasThisHand(_player, playHand.getContent())) {
 						success = false;
 						effectNumber = -1;
 						setMessage(_infoCenter, _players, _player, _currentHand, Message.ERROR);
@@ -870,6 +873,26 @@ class InfoCenter {
 		for(int i=0; i<_cards.size(); i++) {
 			this.playerHand.get(index).add(_cards.get(i));
 		}
+	}
+
+	/**
+	 * to check whether player has this hand
+	 * @param _player player object
+	 * @param _cards cards to be checked
+	 * @retrun if player has this hand
+	 */
+	public boolean getPlayerHasThisHand(Player _player, ArrayList<Card> _cards) {
+		int index = this.getPlayerIndex(_player);
+		boolean result = true;
+		for(int i=0; i<_cards.size(); i++) {
+			try {
+				this.playerHand.get(index).indexOf(_cards.get(i));
+			} catch(Exception e) {
+				result = false;
+				break;
+			}
+		}
+		return result;
 	}
 
 	/**
