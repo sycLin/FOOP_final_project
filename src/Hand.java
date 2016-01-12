@@ -4,6 +4,7 @@ import java.util.*;
 
 class Hand {
 	// ----- constants ----- //
+	public static final byte PASS = 0;
 	public static final byte SINGLE = 1;
 	public static final byte PAIR = 2;
 	public static final byte THREE_OF_A_KIND = 3;
@@ -13,6 +14,10 @@ class Hand {
 
 	// ----- fields ----- //
 	/**
+	 * to store the length of the hand
+	 */
+	private int length;
+	/**
 	 * to store the content of the hand (as ArrayList of Card class)
 	 */
 	private ArrayList<Card> content;
@@ -20,10 +25,6 @@ class Hand {
 	 * to store the content of the hand (as ArrayList of Card class)
 	 */
 	private ArrayList<Card> contentWithJoker;
-	/**
-	 * to store the length of the hand
-	 */
-	private int length;
 	/**
 	 * to store the content of the joker (as ArrayList of Card class)
 	 */
@@ -52,7 +53,7 @@ class Hand {
 		// 2) judge type
 		judgeType(_cards);
 		// 3) add contentWithJoker
-		contentWithJoker = new ArrayList<Card>();
+		contentWithJoker = new ArrayList<Card>(_cards);
 		// 4) count power
 		power = countPower(_cards);
 	}
@@ -110,10 +111,14 @@ class Hand {
 		else if (getPower() < another_hand.getPower())
 			return false;
 		else {
-			if (hasJoker() && !(another_hand.hasJoker()))
+			if (hasJoker() && !(another_hand.hasJoker())) {
+				System.out.println("has Joker!!");
 				return true;
-			else
+			}
+			else{
+				System.out.println("no Joker!!");
 				return false;
+			}
 		}
 	}
 
@@ -122,7 +127,9 @@ class Hand {
 		Collections.sort(_cards);
 
 		// determine the type
-		if (_cards.size() == 1)
+		if (_cards.size() == 0)
+			type = PASS;
+		else if (_cards.size() == 1)
 			type = SINGLE;
 		else if (_cards.size() == 2 && _cards.get(0).getRank() == _cards.get(1).getRank())
 			type = PAIR;
@@ -227,7 +234,7 @@ class Hand {
 	}
 
 	public boolean hasJoker() {
-		if (getJokerContent().size() > 0)
+		if (getJoker().size() > 0)
 			return true;
 		else 
 			return false; 
@@ -287,8 +294,32 @@ class Hand {
 	 * to get all the effects this hand has
 	 * @return array of integers indicating the count of a specific effect.
 	 */
-	public int[] getEffects() {
-		return null;
+	public Map<String, Integer> getEffects() {
+		Map<String, Integer> effectMap = new HashMap<String, Integer>();
+		int skipfive = 0;
+		int giveSeven = 0;
+		int endEight = 0;
+		int abandonTen = 0;
+		int jackBack = 0;
+		ArrayList<Card> cards = getJokerContent();
+		for (int i = 0; i < cards.size(); i++) {
+			if (cards.get(i).getRank() == 5)
+				skipfive++;
+			else if (cards.get(i).getRank() == 7)
+				giveSeven++;
+			else if (cards.get(i).getRank() == 8)
+				endEight++;
+			else if (cards.get(i).getRank() == 10)
+				abandonTen++;
+			else if (cards.get(i).getRank() == 11)
+				jackBack++;
+		}
+		effectMap.put("SkipFive", skipfive);
+		effectMap.put("GiveSeven", giveSeven);
+		effectMap.put("EndEight", endEight);
+		effectMap.put("AbandonTen", abandonTen);
+		effectMap.put("JackBack", jackBack);
+		return effectMap;
 	}
 
 	/**
@@ -315,6 +346,8 @@ class Hand {
 				ret += "Straight flush";
 				break;
 			default:
+				ret += "unknown";
+				break;
 		}
 		ret += "]\n";
 		// then print the content of the hand

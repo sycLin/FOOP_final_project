@@ -19,7 +19,11 @@ class HumanPlayer extends Player{
 			System.out.println("Please enter the cards you want to play.");
 			String input = scanner.nextLine();
 			String[] cardIndices = input.split(" ");
-			
+			// PASS
+			if(cardIndices.length == 0) {
+				retHand = new Hand(retCards);
+				break;
+			}
 			try {	
 				for(int i = 0; i < cardIndices.length; i ++) {
 					Card tmp = myCards.get(Integer.parse(cardIndices[i]));
@@ -98,7 +102,23 @@ class HumanPlayer extends Player{
 		}
 		return retCards;
 	}
-	public void update_info(Message msg);
+	public void update_info(Message msg) {
+		// update_info will also be called when all people pass.
+
+	}
+	public void enter_name() {
+		Scanner scanner = new Scanner(System.in);
+		while(true) {
+			System.out.println("Please enter your name");
+			tmp = scanner.nextLine();
+			if(tmp.length() > Player.MAX_NAME_LENGTH) {
+				System.out.println("please enter name length smaller than 50.");
+				continue;
+			}
+			name = tmp;
+			break;
+		}
+	}
 	private void printCards(ArrayList<Card> myCards) {
 		for(int i = 0; i < myCards.size(); i ++) {
 			System.out.print("(" + i + ")" + myCards.get(i).toString());
