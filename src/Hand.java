@@ -17,11 +17,15 @@ class Hand {
 	 */
 	private ArrayList<Card> content;
 	/**
+	 * to store the content of the hand (as ArrayList of Card class)
+	 */
+	private ArrayList<Card> contentWithJoker;
+	/**
 	 * to store the length of the hand
 	 */
 	private int length;
 	/**
-	 * to store the length of the hand
+	 * to store the content of the joker (as ArrayList of Card class)
 	 */
 	private ArrayList<Card> joker;
 	/**
@@ -31,7 +35,7 @@ class Hand {
 	/**
 	 * to store the power of this hand (with regard to the type)
 	 */
-	private int power;
+	private byte power;
 
 	// ----- actions ----- //
 	
@@ -40,12 +44,17 @@ class Hand {
 	 * @param _cards an ArrayList of cards to create hand
 	 */
 	public Hand(ArrayList<Card> _cards) {
-		// 1) judge type
-		judgeType(_cards);
-		// 2) determine the power
-		// 3) save the content
+		// 1) save the content
 		length = _cards.size();
 		content = new ArrayList<Card>(_cards);
+		Collections.sort(content);
+		joker = new ArrayList<Card>();
+		// 2) judge type
+		judgeType(_cards);
+		// 3) add contentWithJoker
+		contentWithJoker = new ArrayList<Card>();
+		// 4) count power
+		power = countPower(_cards);
 	}
 
 	/**
@@ -54,7 +63,12 @@ class Hand {
 	 * @param _jokers an ArrayList of cards that jokers represent
 	 */
 	public Hand(ArrayList<Card> _cards, ArrayList<Card> _jokers) {
+		// 1) save the content
+		length = _cards.size();
+		content = new ArrayList<Card>(_cards);
+		Collections.sort(content);
 		joker = new ArrayList<Card>(_jokers);
+		Collections.sort(joker);
 		int jokerSize = _jokers.size();
 		for (int i = 0; i < _cards.size(); i++) {
 			if (_cards.get(i).getRank() == 0) {
@@ -65,12 +79,12 @@ class Hand {
 					System.out.println("Wrong parameters");
 			}
 		}
-		// 1) judge type
+		// 2) judge type
 		judgeType(_cards);
-		// 2) determine the power
-		// 3) save the content
-		length = _cards.size();
-		content = new ArrayList<Card>(_cards);
+		// 3) add contentWithJoker
+		contentWithJoker = new ArrayList<Card>(_cards);
+		// 4) count power
+		power = countPower(_cards);
 	}
 
 	/**
@@ -79,8 +93,28 @@ class Hand {
 	 * @return true if can be played on another_hand
 	 */
 	public boolean beats(Hand another_hand) {
-		System.err.println("beats() function not implemented yet...");
-		return false;
+		// lengths not equal, cannot beat
+		if (getLength() != another_hand.getLength())
+			return false;
+
+		// types not equal, or one of them is UNKNOWN, cannot beat
+		if (getType() != another_hand.getType())
+			return false;
+		else
+			if (getType() == UNKNOWN || another_hand.getType() == UNKNOWN)
+				return false;
+
+		// compare the power
+		if (getPower() > another_hand.getPower())
+			return true;
+		else if (getPower() < another_hand.getPower())
+			return false;
+		else {
+			if (hasJoker() && !(another_hand.hasJoker()))
+				return true;
+			else
+				return false;
+		}
 	}
 
 	public void judgeType(ArrayList<Card> _cards) {
@@ -88,25 +122,40 @@ class Hand {
 		Collections.sort(_cards);
 
 		// determine the type
-		if(_cards.size() == 1)
+		if (_cards.size() == 1)
 			type = SINGLE;
-		else if(_cards.size() == 2 && _cards.get(0).getRank() == _cards.get(1).getRank())
+		else if (_cards.size() == 2 && _cards.get(0).getRank() == _cards.get(1).getRank())
 			type = PAIR;
-		else if(_cards.size() == 3 
+		else if (_cards.size() == 3 
 			&& _cards.get(0).getRank() == _cards.get(1).getRank() 
 			&& _cards.get(0).getRank() == _cards.get(2).getRank())
 			type = THREE_OF_A_KIND;
-		else if(_cards.size() == 4 
+		else if (_cards.size() == 4 
 			&& _cards.get(0).getRank() == _cards.get(1).getRank() 
 			&& _cards.get(0).getRank() == _cards.get(2).getRank()
 			&& _cards.get(0).getRank() == _cards.get(3).getRank())
 			type = FOUR_OF_A_KIND;
-		else if(_cards.size() >= 4) {
+		else if (_cards.size() >= 4) {
 			// check if straight flush
-			boolean sfFlag = isStraightFlush(_cards);
+			if (isStraightFlush(_cards))
+				type = STRAIGHT_FLUSH;
+			else
+				type = UNKNOWN;
 		} else {
 			type = UNKNOWN;
 		}
+	}
+
+	public byte countPower(ArrayList<Card> cards) {
+		byte ret = 0;
+		byte tmp = 0;
+		for (int i = 0; i < cards.size(); i++) {
+			tmp = cards.get(i).getRank();
+			if (cards.get(i).getRank() <= 2)
+				tmp += 13;
+			ret += tmp;
+		}
+		return ret;
 	}
 
 	/**
@@ -127,8 +176,18 @@ class Hand {
 				return false;
 
 		// compare the suit
+		ArrayList<Card> first;
+		ArrayList<Card> second;
+		if (hasJoker())
+			first = getJokerContent();
+		else 
+			first = getContent();
+		if (another_hand.hasJoker())
+			second = another_hand.getJokerContent();
+		else 
+			second = another_hand.getContent();
 		for (int i = 0; i < getLength(); i++)
-			if (getContent().get(i).getSuit() != another_hand.getContent().get(i).getSuit())
+			if (first.get(i).getSuit() != second.get(i).getSuit())
 				return false;
 
 		return true;
@@ -168,7 +227,7 @@ class Hand {
 	}
 
 	public boolean hasJoker() {
-		if (joker.size() > 0)
+		if (getJokerContent().size() > 0)
 			return true;
 		else 
 			return false; 
@@ -201,11 +260,27 @@ class Hand {
 	}
 
 	/**
+	 * to get the joker of this hand
+	 * @return the joker
+	 */
+	public ArrayList<Card> getJoker() {
+		return this.joker;
+	}
+
+	/**
+	 * to get the content of this hand (with jokers inserting)
+	 * @return the contentWithJoker
+	 */
+	public ArrayList<Card> getJokerContent() {
+		return this.contentWithJoker;
+	}
+
+	/**
 	 * to get the jokers of this hand
 	 * @return the jokers
 	 */
-	public ArrayList<Card> getJokerContent() {
-		return this.joker;
+	public byte getPower() {
+		return this.power;
 	}
 
 	/**
