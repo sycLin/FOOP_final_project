@@ -167,6 +167,13 @@ class Hand {
 		return true;
 	}
 
+	public boolean hasJoker() {
+		if (joker.size() > 0)
+			return true;
+		else 
+			return false; 
+	}
+
 	/**
 	 * to get the type of this hand
 	 * @return a byte representing the type of this hand
