@@ -11,12 +11,9 @@ public abstract class Player {
 	 * a point system designed to determine the final winner.
 	 */
 	private int point;
-	public static final byte GRAND_MILLIONAIRE = 1;
-	public static final byte MILLIONAIRE = 2;
-	public static final byte COMMONER = 3;
-	public static final byte NEEDY = 4;
-	public static final byte EXTREME_NEEDY = 5;
 	private byte title;
+	private String name;
+	public static final int MAX_NAME_LENGTH = 50;
 	Player() {
 		point = 0;	
 	}
@@ -64,6 +61,15 @@ public abstract class Player {
 		return ret;
 	}
 
+
+	/**
+	 *	Get player's name.
+	 */
+	public final String get_name() {
+		String n = name;
+		return name;
+	}
+
 	// ----- abstract methods ----- //
 
 	public abstract ArrayList<Card> play_card(ArrayList<Card> myCards);
@@ -72,4 +78,5 @@ public abstract class Player {
 	 */
 	public abstract ArrayList<Card> give_up_card(ArrayList<Card> myCards, int number);
 	public abstract void update_info(Message msg);
+	public abstract void enter_name();
 }
