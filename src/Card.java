@@ -28,6 +28,42 @@ final class Card implements Comparable<Card> {
 		suit = s;
 		rank = r;
 	}
+	public Card(String info) {
+		switch(info.charAt(0)) {
+			case 'C': 
+				suit = CLUB;
+				break;
+			case 'D':
+				suit = DIAMOND;
+				break;
+			case 'H':
+				suit = HEART;
+				break;
+			case 'S':
+				suit = SPADE;
+				break;
+		}
+		switch(info.charAt(1)) {
+			// 2 ~ 9
+			case 'A':
+				rank = (byte)1;
+				break;
+			case 'K':
+				rank = (byte)13;
+				break;
+			case 'Q':
+				rank = (byte)12;
+				break;
+			case 'J':
+				rank = (byte)11;
+				break;
+			case 'T':
+				rank = (byte)10;
+				break;
+			default: 
+				rank = (byte)(info.charAt(1) - '0');
+		}
+	}
 
 	/**
 	 * to get the suit of the card
