@@ -311,7 +311,7 @@ public class Daifugo {
 				try {
 					_player.update_info(msg);
 					playHand = _player.play_card(_infoCenter.getPlayerHand(_player));
-					if (canBeat(_currentHand.beats(playHand), _currentHand, playHand)) {
+					if (canBeat(_currentHand.beats(playHand), _currentHand, playHand) && _infoCenter.getPlayerHasThisHand(_player, playHand.getContent())) {
 						_infoCenter.removePlayerHand(_player, playHand.getContent());
 						effectNumber = judge(_infoCenter, _players, _player, _currentHand, playHand);
 						setMessage(_infoCenter, _players, _player, _currentHand, Message.BASIC);
