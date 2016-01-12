@@ -201,16 +201,16 @@ public class Daifugo {
 			if(newHand.getType() == Hand.STRAIGHT_FLUSH) {
 				isUnderRevolution = !isUnderRevolution;
 			}
-			if(effects.get("SkipFive")) {
+			if(effects.get("SkipFive") > 0) {
 				effectNumber = effects.get("SkipFive");
 			}
-			if(effects.get("GiveSeven")) {
-				Arraylist<Card> giveCards = _player.give_up_card(_infoCenter.getPlayerHand(_player), effects.get("GiveSeven"));
+			if(effects.get("GiveSeven") > 0) {
+				ArrayList<Card> giveCards = _player.give_up_card(_infoCenter.getPlayerHand(_player), effects.get("GiveSeven"));
 				int give = giveCards.size();
 				if(give != effects.get("GiveSeven")) {
 					int playing = _infoCenter.getPlayingNumber() - 1;
-					infoCenter.setPlayerNoHand(_player);
-					infoCenter.setPlayerStatus(_player, infoCenter.getStatus(playing));
+					_infoCenter.setPlayerNoHand(_player);
+					_infoCenter.setPlayerStatus(_player, _infoCenter.getStatus(playing));
 					effectNumber = -7;
 					return effectNumber;
 				} else {
@@ -218,22 +218,24 @@ public class Daifugo {
 					_infoCenter.removePlayerHand(_player, giveCards);
 				}
 			}
-			if(effects.get("EndEight")) {
-				infoCenter.setPlayerIsLeader(_player);
-				infoCenter.setPlayerIsLastPlayer(_player);
+			if(effects.get("EndEight") > 0) {
+				_infoCenter.setPlayerIsLeader(_player);
+				_infoCenter.setPlayerIsLastPlayer(_player);
 			}
-			if(effects.get("AbandonTen")) {
+			if(effects.get("AbandonTen") > 0) {
+				ArrayList<Card> giveCards = _player.give_up_card(_infoCenter.getPlayerHand(_player), effects.get("AbandonTen"));
+				int give = giveCards.size();
 				if(give != effects.get("AbandonTen")) {
 					int playing = _infoCenter.getPlayingNumber() - 1;
-					infoCenter.setPlayerNoHand(_player);
-					infoCenter.setPlayerStatus(_player, infoCenter.getStatus(playing));
+					_infoCenter.setPlayerNoHand(_player);
+					_infoCenter.setPlayerStatus(_player, _infoCenter.getStatus(playing));
 					effectNumber = -10;
 					return effectNumber;
 				} else {
 					_infoCenter.removePlayerHand(_player, giveCards);
 				}
 			}
-			if(effects.get("JackBack")) {
+			if(effects.get("JackBack") > 0) {
 				isUnderJackBack = true;
 			}
 		}
@@ -439,7 +441,7 @@ public class Daifugo {
 	 * to init new game setting for each round
 	 * @param _infoCenter InforCenter's reference
 	 * @param _deck 	  Deck's reference
-	 * @param _players 	  Arraylist of Player's reference
+	 * @param _players 	  ArrayList of Player's reference
 	 */
 	public static void startNewGame(InfoCenter _infoCenter, Deck _deck, ArrayList<Player> _players) {
 		_infoCenter.startNewGame();
@@ -863,7 +865,7 @@ class InfoCenter {
 	 * @param _player player object
 	 * @param _cards cards to be added
 	 */
-	public void addPlayerHand(Player _player, Arraylist<Card> _cards) {
+	public void addPlayerHand(Player _player, ArrayList<Card> _cards) {
 		int index = this.getPlayerIndex(_player);
 		for(int i=0; i<_cards.size(); i++) {
 			this.playerHand.get(index).add(_cards.get(i));
