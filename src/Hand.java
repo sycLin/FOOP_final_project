@@ -13,6 +13,10 @@ class Hand {
 
 	// ----- fields ----- //
 	/**
+	 * to store the length of the hand
+	 */
+	private int length;
+	/**
 	 * to store the content of the hand (as ArrayList of Card class)
 	 */
 	private ArrayList<Card> content;
@@ -20,10 +24,6 @@ class Hand {
 	 * to store the content of the hand (as ArrayList of Card class)
 	 */
 	private ArrayList<Card> contentWithJoker;
-	/**
-	 * to store the length of the hand
-	 */
-	private int length;
 	/**
 	 * to store the content of the joker (as ArrayList of Card class)
 	 */
@@ -227,7 +227,7 @@ class Hand {
 	}
 
 	public boolean hasJoker() {
-		if (getJokerContent().size() > 0)
+		if (getJoker().size() > 0)
 			return true;
 		else 
 			return false; 
