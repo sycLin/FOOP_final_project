@@ -44,7 +44,7 @@ final class Card implements Comparable<Card> {
 				break;
 		}
 		switch(info.charAt(1)) {
-			// 2 ~ 9
+			
 			case 'A':
 				rank = (byte)1;
 				break;
@@ -60,6 +60,7 @@ final class Card implements Comparable<Card> {
 			case 'T':
 				rank = (byte)10;
 				break;
+			// 2 ~ 9
 			default: 
 				rank = (byte)(info.charAt(1) - '0');
 		}
