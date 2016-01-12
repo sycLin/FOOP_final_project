@@ -21,47 +21,47 @@ class Message {
 	/**
 	 * the type of this message: BASIC or ERROR
 	 */
-	byte type;
+	public byte type;
 
 	/**
 	 * the position of the player to whom the lastHand belongs
 	 */
-	int lastPlayer;
+	public int lastPlayer;
 
 	/**
 	 * the last hand on table
 	 */
-	Hand lastHand;
+	public Hand lastHand;
 
 	/**
 	 * the position of the next player to play
 	 */
-	int whoseTurn;
+	public int whoseTurn;
 
 	/**
 	 * array of boolean to indicate whether the player is active or not
 	 */
-	boolean[] playerStatus;
+	public boolean[] playerStatus;
 
 	/**
 	 * whether it's under revolution
 	 */
-	boolean isUnderRevolution;
+	public boolean isUnderRevolution;
 
 	/**
 	 * whether it's under jackBack
 	 */
-	boolean isUnderJackBack;
+	public boolean isUnderJackBack;
 
 	/**
 	 * whether it's a new trick
 	 */
-	boolean isNewTrick;
+	public boolean isNewTrick;
 
 	/**
 	 * whether it's tight
 	 */
-	boolean isTight;
+	public boolean isTight;
 
 	// ----- actions ----- //
 
@@ -69,7 +69,15 @@ class Message {
 	 * to construct a message containing basic information
 	 */
 	public Message() {
-		;
+		this.type = BASIC; // default basic message
+		lastPlayer = -1;
+		lastHand = null;
+		whoseTurn = -1;
+		playerStatus = null;
+		isUnderRevolution = false;
+		isUnderJackBack = false;
+		isNewTrick = false;
+		isTight = false;
 	}
 
 	/**
@@ -78,6 +86,14 @@ class Message {
 	 */
 	public Message(byte errMsg) {
 		this.type = errMsg;
+		lastPlayer = -1;
+		lastHand = null;
+		whoseTurn = -1;
+		playerStatus = null;
+		isUnderRevolution = false;
+		isUnderJackBack = false;
+		isNewTrick = false;
+		isTight = false;
 	}
 
 }
