@@ -16,6 +16,19 @@ class Message {
 	 */
 	public static final byte ERROR = 2;
 
+	/**
+	 * to indicate the action that triggers this message
+	 * (use bit-wise operation to access)
+	 */
+	public static final short ACTION_PLAYING	= (short)0b0000000000000001;
+	public static final short ACTION_WINNING	= (short)0b0000000000000010;
+	public static final short ACTION_LOSING		= (short)0b0000000000000100;
+	public static final short ACTION_LEADING	= (short)0b0000000000001000;
+	public static final short ACTION_NEW_ROUND	= (short)0b0000000000010000;
+	public static final short ACTION_CANT_BEAT	= (short)0b0000000000100000;
+	public static final short ACTION_WRONG_TYPE	= (short)0b0000000001000000;
+
+
 	// ----- fields ----- //
 
 	/**
@@ -24,24 +37,9 @@ class Message {
 	public byte type;
 
 	/**
-	 * the position of the player to whom the lastHand belongs
-	 */
-	public int lastPlayer;
-
-	/**
-	 * the last hand on table
-	 */
-	public Hand lastHand;
-
-	/**
 	 * the position of the next player to play
 	 */
 	public int whoseTurn;
-
-	/**
-	 * array of boolean to indicate whether the player is active or not
-	 */
-	public boolean[] playerStatus;
 
 	/**
 	 * whether it's under revolution
@@ -52,11 +50,6 @@ class Message {
 	 * whether it's under jackBack
 	 */
 	public boolean isUnderJackBack;
-
-	/**
-	 * whether it's a new trick
-	 */
-	public boolean isNewTrick;
 
 	/**
 	 * whether it's tight
