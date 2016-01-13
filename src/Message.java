@@ -179,7 +179,8 @@ class Message {
 
 	public String toString() {
 		String ret = "";
-		ret += ("TYPE: " + type + '\n');
+		String[] typeList = {"", "BASIC", "ERROR"};
+		ret += ("TYPE: " + typeList[(int)type] + '\n');
 		ret += ("current Player: " + currentPlayer + '\n');
 		ret += ("current Hand: " + currentHand + '\n');
 		ret += ("content: " + content + '\n');
@@ -191,5 +192,4 @@ class Message {
 		ret += ("tight: " + isTight + '\n');
 		return ret;
 	}
-
 }
