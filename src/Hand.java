@@ -327,7 +327,7 @@ class Hand {
 	public String toString() {
 		// print the type of the hand first
 		String ret = "[";
-		switch(getType()) {
+		switch(type) {
 			case SINGLE:
 				ret += "Single";
 				break;
@@ -352,9 +352,8 @@ class Hand {
 		}
 		ret += "]\n";
 		// then print the content of the hand
-		ArrayList<Card> cont = getJokerContent();
-		for (int i = 0; i < cont.size(); i++) {
-			ret += (cont.get(i) + " ");
+		for (int i = 0; i < contentWithJoker.size(); i++) {
+			ret += (contentWithJoker.get(i) + " ");
 		}
 		return ret;
 	}
