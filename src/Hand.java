@@ -112,11 +112,9 @@ class Hand {
 			return false;
 		else {
 			if (hasJoker() && !(another_hand.hasJoker())) {
-				System.out.println("has Joker!!");
 				return true;
 			}
 			else{
-				System.out.println("no Joker!!");
 				return false;
 			}
 		}
@@ -295,7 +293,7 @@ class Hand {
 	 * @return array of integers indicating the count of a specific effect.
 	 */
 	public Map<String, Integer> getEffects() {
-		Map<String, Integer> effectMap = new HashMap<String, Integer>();
+		Map<String, Integer> effectMap = new HashMap<String, Integer>();	// Map is abstract
 		int skipfive = 0;
 		int giveSeven = 0;
 		int endEight = 0;
@@ -329,7 +327,7 @@ class Hand {
 	public String toString() {
 		// print the type of the hand first
 		String ret = "[";
-		switch(type) {
+		switch(getType()) {
 			case SINGLE:
 				ret += "Single";
 				break;
@@ -345,14 +343,18 @@ class Hand {
 			case STRAIGHT_FLUSH:
 				ret += "Straight flush";
 				break;
+			case PASS:
+				ret += "Pass";
+				break;
 			default:
 				ret += "unknown";
 				break;
 		}
 		ret += "]\n";
 		// then print the content of the hand
-		for(int i=0; i<content.size(); i++) {
-			ret += (content.get(i) + " ");
+		ArrayList<Card> cont = getJokerContent();
+		for (int i = 0; i < cont.size(); i++) {
+			ret += (cont.get(i) + " ");
 		}
 		return ret;
 	}

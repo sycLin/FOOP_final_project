@@ -25,68 +25,171 @@ class Message {
 	public static final short ACTION_LOSING		= (short)0b0000000000000100;
 	public static final short ACTION_LEADING	= (short)0b0000000000001000;
 	public static final short ACTION_NEW_ROUND	= (short)0b0000000000010000;
-	public static final short ACTION_CANT_BEAT	= (short)0b0000000000100000;
-	public static final short ACTION_WRONG_TYPE	= (short)0b0000000001000000;
+	public static final short ACTION_ROUND_END	= (short)0b0000000000100000;
+	public static final short ACTION_CANT_BEAT	= (short)0b0000000001000000;
+	public static final short ACTION_WRONG_TYPE	= (short)0b0000000010000000;
 
+	/**
+	 * to indicate the occasions of the game
+	 * (use bit-wise operation to access)
+	 */
+	public static final short WHEN_WINNING	= (short)0b0000000000000011;
+	public static final short WHEN_LOSING	= (short)0b0000000000000100;
+	public static final short WHEN_PLAY		= (short)0b0000000000000001;
+	public static final short NEW_TRICK		= (short)0b0000000000001000;
+	public static final short ROUND_START	= (short)0b0000000000010000;
+	public static final short ROUND_END		= (short)0b0000000000100000;
+	public static final short SOMETHING_BAD	= (short)0b0000000011000000;
 
 	// ----- fields ----- //
 
 	/**
-	 * the type of this message: BASIC or ERROR
+	 * the type of this message: BASIC or ERROR (initially BASIC)
 	 */
-	public byte type;
+	private byte type = BASIC;
+
+	/**
+	 * the position of the current playing player
+	 */
+	private int currentPlayer;
+
+	/**
+	 * the hand of this player 
+	 */
+	private Hand currentHand;
+
+	/**
+	 * the content of the cards that triggered by specific effects
+	 */
+	private ArrayList<Card> content;
+
+	/**
+	 * the position of the last player to play
+	 */
+	private int lastPlayer;
+
+	/**
+	 * the hand of last player 
+	 */
+	private Hand lastHand;
 
 	/**
 	 * the position of the next player to play
 	 */
-	public int whoseTurn;
+	private int nextPlayer;
 
 	/**
 	 * whether it's under revolution
 	 */
-	public boolean isUnderRevolution;
+	private boolean isUnderRevolution;
 
 	/**
 	 * whether it's under jackBack
 	 */
-	public boolean isUnderJackBack;
+	private boolean isUnderJackBack;
 
 	/**
 	 * whether it's tight
 	 */
-	public boolean isTight;
+	private boolean isTight;
 
 	// ----- actions ----- //
 
 	/**
 	 * to construct a message containing basic information
 	 */
-	public Message() {
-		this.type = BASIC; // default basic message
-		lastPlayer = -1;
-		lastHand = null;
-		whoseTurn = -1;
-		playerStatus = null;
-		isUnderRevolution = false;
-		isUnderJackBack = false;
-		isNewTrick = false;
-		isTight = false;
+	public Message(int cPlayer, Hand cHand, int lPlayer, Hand lHand, ArrayList<Card> cont, int nPlayer, boolean isR, boolean isJ, boolean isT) {
+		currentPlayer = cPlayer;
+		if (cHand != null)
+			currentHand = new Hand(cHand.getContent());
+		else 
+			currentHand = new Hand(new ArrayList<Card>());
+		lastPlayer = lPlayer;
+		if (lHand != null)
+			lastHand = new Hand(lHand.getContent());
+		else
+			lastHand = new Hand(new ArrayList<Card>());
+		content = cont;
+		nextPlayer = nPlayer;
+		isUnderRevolution = isR;
+		isUnderJackBack = isJ;
+		isTight = isT;
 	}
 
 	/**
 	 * to construct a message to inform player of his/her erroneus move
 	 * @param errMsg the error message
 	 */
-	public Message(byte errMsg) {
+	public Message(byte errMsg, int cPlayer, Hand cHand, int lPlayer, Hand lHand, ArrayList<Card> cont, int nPlayer, boolean isR, boolean isJ, boolean isT) {
+		this(cPlayer, cHand, lPlayer, lHand, cont, nPlayer, isR, isJ, isT);
 		this.type = errMsg;
-		lastPlayer = -1;
-		lastHand = null;
-		whoseTurn = -1;
-		playerStatus = null;
-		isUnderRevolution = false;
-		isUnderJackBack = false;
-		isNewTrick = false;
-		isTight = false;
+	}
+
+	public byte getType() {
+		byte ret = type;
+		return ret;
+	}
+
+	public int getCurrentPlayer() {
+		int ret = currentPlayer;
+		return ret;
+	}
+
+	public Hand getCurrentHand() {
+		ArrayList<Card> cont = currentHand.getContent();
+		ArrayList<Card> joker = currentHand.getJokerContent();
+		return new Hand(cont, joker);
+	}
+
+	public ArrayList<Card> getContent() {
+		ArrayList<Card> ret = content;
+		return ret;
+	}
+
+	public int getLastPlayer() {
+		int ret = lastPlayer;
+		return ret;
+	}
+
+	public Hand getLastHand() {
+		ArrayList<Card> cont = lastHand.getContent();
+		ArrayList<Card> joker = lastHand.getJokerContent();
+		return new Hand(cont, joker);
+	}
+
+	public int getNextPlayer() {
+		int ret = nextPlayer;
+		return ret;
+	}
+
+	public boolean isUnderRevolution() {
+		boolean ret = isUnderRevolution;
+		return ret;
+	}
+
+	public boolean isUnderJackBack() {
+		boolean ret = isUnderJackBack;
+		return ret;
+	}
+
+	public boolean isTight() {
+		boolean ret = isTight;
+		return ret;
+	}
+
+	public String toString() {
+		String ret = "";
+		ret += ("TYPE: " + type + '\n');
+		ret += ("current Player: " + currentPlayer + '\n');
+		ret += ("current Hand: " + currentHand + '\n');
+		ret += ("content: " + content + '\n');
+		ret += ("last Player: " + lastPlayer + '\n');
+		ret += ("last Hand: " + lastHand + '\n');
+		ret += ("next Player: " + nextPlayer + '\n');
+		ret += ("revolution: " + isUnderRevolution + '\n');
+		ret += ("jackback: " + isUnderJackBack + '\n');
+		ret += ("tight: " + isTight + '\n');
+		return ret;
 	}
 
 }
