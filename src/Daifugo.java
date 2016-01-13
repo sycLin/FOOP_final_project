@@ -60,6 +60,7 @@ public class Daifugo {
 				for(int i=0; i<nPlayer; i++) {
 					Player p = players.get(i);
 					if(!infoCenter.getPlayerNoHand(p)) {
+						
 						if(effectNumber > 0) {
 							effectNumber--;
 							continue;
@@ -67,6 +68,7 @@ public class Daifugo {
 						if(effectNumber < 0) {
 							effectNumber = 0;
 						}
+
 						if(infoCenter.getPlayerIsLeader(p) && infoCenter.getPlayerIsLastPlayer(p)) {
 							// 
 							// can't skip, do anything you want.
@@ -91,11 +93,12 @@ public class Daifugo {
 							if(true) {
 								skipNumber++;
 							} else {
-								infoCenter.setPlayerIsLastPlayer(p);
 								effectNumber = getAndCheckHand(infoCenter, players, p, currentHand);
 								if(effectNumber == -1) {
 									skipNumber++;
-								} 
+								} else {
+									infoCenter.setPlayerIsLastPlayer(p);
+								}
 							}
 
 						} else if(!infoCenter.getPlayerIsLeader(p) && infoCenter.getPlayerIsLastPlayer(p)) {
@@ -110,9 +113,9 @@ public class Daifugo {
 							isTight = false;
 							isUnderJackBack = false;
 							currentHand = null;
+							infoCenter.setPlayerIsLeader(p);
 							setMessage(infoCenter, players, p, currentHand, Message.BASIC, 0);
 							updateInfo(players);
-							infoCenter.setPlayerIsLeader(p);
 							effectNumber = getAndCheckHand(infoCenter, players, p, currentHand);
 
 						} else if(!infoCenter.getPlayerIsLeader(p) && !infoCenter.getPlayerIsLastPlayer(p) &&
@@ -128,11 +131,11 @@ public class Daifugo {
 							isTight = false;
 							isUnderJackBack = false;
 							currentHand = null;
+							infoCenter.setPlayerIsLeader(p);
 							setMessage(infoCenter, players, p, currentHand, Message.BASIC, 0);
 							updateInfo(players);
-							infoCenter.setPlayerIsLeader(p);
-							infoCenter.setPlayerIsLastPlayer(p);
 							effectNumber = getAndCheckHand(infoCenter, players, p, currentHand);
+							infoCenter.setPlayerIsLastPlayer(p);
 
 						} else {
 							// 
@@ -142,11 +145,12 @@ public class Daifugo {
 							if(true) {
 								skipNumber++;
 							} else {
-								infoCenter.setPlayerIsLastPlayer(p);
 								effectNumber = getAndCheckHand(infoCenter, players, p, currentHand);
 								if(effectNumber == -1) {
 									skipNumber++;
-								} 
+								} else {
+									infoCenter.setPlayerIsLastPlayer(p);
+								}
 							}
 						}
 
@@ -373,13 +377,43 @@ public class Daifugo {
 		msg.type = _type;
 		msg.lastPlayer = _players.indexOf(_infoCenter.getLastPlayedPlayer());
 		msg.lastHand = _currentHand;
+
 		if(_effectNumber == 0) {
 			msg.whoseTurn = _players.indexOf(_player);
 		} else if(_effectNumber < 0) {
 			// goes to next player
+			Player nextPlayer = null;
+			int cur = _players.indexOf(_player);
+			while(true) {
+				cur = (cur+1)%nPlayer;
+				if(cur != _players.indexOf(_player)) {
+					nextPlayer = _players.get(cur);
+					if(!_infoCenter.getPlayerNoHand(nextPlayer)) {
+						break;
+					}
+				}
+			}
+			msg.whoseTurn = cur;
 		} else {
 			// skip effectNumber of player
+			Player nextPlayer = null;
+			int cur = _players.indexOf(_player);
+			int skip = _effectNumber;
+			while(true) {
+				cur = (cur+1)%nPlayer;
+				if(cur != _players.indexOf(_player)) {
+					nextPlayer = _players.get(cur);
+					if(skip == 0) {
+						break;
+					}
+					if(!_infoCenter.getPlayerNoHand(nextPlayer)) {
+						skip -= 1;
+					}
+				}
+			}
+			msg.whoseTurn = cur;
 		}
+
 		boolean[] playing = new boolean[nPlayer];
 		for(int i=0; i<nPlayer; i++) {
 			if(_infoCenter.getPlayerIsPlaying(_players.get(i))) {
