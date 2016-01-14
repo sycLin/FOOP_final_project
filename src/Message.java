@@ -173,17 +173,20 @@ class Message {
 
 	public String toString() {
 		String ret = "";
-		String[] typeList = {"", "BASIC", "ERROR"};
-		ret += ("TYPE: " + typeList[(int)type] + '\n');
-		ret += ("current Player: " + currentPlayer + '\n');
-		ret += ("current Hand: " + currentHand + '\n');
-		ret += ("content: " + content + '\n');
-		ret += ("last Player: " + lastPlayer + '\n');
-		ret += ("last Hand: " + lastHand + '\n');
-		ret += ("next Player: " + nextPlayer + '\n');
-		ret += ("revolution: " + isUnderRevolution + '\n');
-		ret += ("jackback: " + isUnderJackBack + '\n');
-		ret += ("tight: " + isTight + '\n');
+		
+		/* should be modified accordingly, so I commented out the below */
+
+		// String[] typeList = {"", "BASIC", "ERROR"};
+		// ret += ("TYPE: " + typeList[(int)type] + '\n');
+		// ret += ("current Player: " + currentPlayer + '\n');
+		// ret += ("current Hand: " + currentHand + '\n');
+		// ret += ("content: " + content + '\n');
+		// ret += ("last Player: " + lastPlayer + '\n');
+		// ret += ("last Hand: " + lastHand + '\n');
+		// ret += ("next Player: " + nextPlayer + '\n');
+		// ret += ("revolution: " + isUnderRevolution + '\n');
+		// ret += ("jackback: " + isUnderJackBack + '\n');
+		// ret += ("tight: " + isTight + '\n');
 		return ret;
 	}
 }
