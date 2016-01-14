@@ -8,6 +8,7 @@ public class Daifugo {
 	private static boolean isUnderJackBack;
 	private static boolean isUnderRevolution;
 	private static boolean isTight;
+	private static boolean isNewTrick;
 	private static int nPlayer;
 	private static int nHumanPlayer;
 	private static int nAIPlayer;
@@ -24,7 +25,6 @@ public class Daifugo {
 		Hand currentHand = null;
 		int skipNumber = 0;
 		int effectNumber = 0;
-		msg = new Message(Message.BASIC);
 		// System.err.println("warning: main() not implemented.");
 		// 
 		// get init settings from user's input
@@ -41,56 +41,52 @@ public class Daifugo {
 			isUnderJackBack = false;
 			isUnderRevolution = false;
 			isTight = false;
+			isNewTrick = true;
 
 			System.out.println("=========="+"Round "+(r+1)+"==========");
 			startNewGame(infoCenter, deck, players);
 
-			/*test player get card*/
-			for(int i=0; i<nPlayer; i++) {
-				System.out.println("Player"+i+" : ");
-				ArrayList<Card> hand = infoCenter.getPlayerHand(players.get(i));
-				for(int j=0; j<hand.size(); j++) {
-					System.out.print(hand.get(j)+" ");
-				}
-				System.out.println();
-			}
-			System.out.println(infoCenter.getPlayingNumber());
+			msg = new Message(-1, Message.ACTION_NEW_ROUND, (Object)null, isUnderRevolution, isUnderJackBack, isTight);
+			updateInfo(players);
 
 			while(infoCenter.getPlayingNumber() > 0) {
 				for(int i=0; i<nPlayer; i++) {
 					Player p = players.get(i);
 					if(!infoCenter.getPlayerNoHand(p)) {
+						
 						if(effectNumber > 0) {
-							effectNumber--;
+							effectNumber -= 1;
+							System.out.println("Skip "+p.get_name()+".");
 							continue;
 						}
+						if(effectNumber < 0) {
+							effectNumber = 0;
+						}
+
 						if(infoCenter.getPlayerIsLeader(p) && infoCenter.getPlayerIsLastPlayer(p)) {
 							// 
 							// can't skip, do anything you want.
 							//
 							System.out.println("-------"+"Tricks "+(++trick)+"-------");
 							skipNumber = 0;
-							msg.isNewTrick = true;
-							msg.isTight = false;
-							msg.isUnderJackBack = false; 
 							isTight = false;
 							isUnderJackBack = false;
+							isNewTrick = true;
 							currentHand = null;
+							msg = new Message(i, Message.ACTION_LEADING, (Object)null, isUnderRevolution, isUnderJackBack, isTight);
+							updateInfo(players);
 							effectNumber = getAndCheckHand(infoCenter, players, p, currentHand);
 
 						} else if(infoCenter.getPlayerIsLeader(p) && !infoCenter.getPlayerIsLastPlayer(p)) {
 							// 
 							// can skip or play hand
 							// 
-							msg.isNewTrick = false;
-							if(true) {
+							isNewTrick = false;
+							effectNumber = getAndCheckHand(infoCenter, players, p, currentHand);
+							if(effectNumber == -1) {
 								skipNumber++;
 							} else {
 								infoCenter.setPlayerIsLastPlayer(p);
-								effectNumber = getAndCheckHand(infoCenter, players, p, currentHand);
-								if(effectNumber == -1) {
-									skipNumber++;
-								} 
 							}
 
 						} else if(!infoCenter.getPlayerIsLeader(p) && infoCenter.getPlayerIsLastPlayer(p)) {
@@ -99,13 +95,13 @@ public class Daifugo {
 							// 
 							System.out.println("-------"+"Tricks "+(++trick)+"-------");
 							skipNumber = 0;
-							msg.isNewTrick = true;
-							msg.isTight = false;
-							msg.isUnderJackBack = false;
 							isTight = false;
 							isUnderJackBack = false;
+							isNewTrick = true;
 							currentHand = null;
 							infoCenter.setPlayerIsLeader(p);
+							msg = new Message(i, Message.ACTION_LEADING, (Object)null, isUnderRevolution, isUnderJackBack, isTight);
+							updateInfo(players);
 							effectNumber = getAndCheckHand(infoCenter, players, p, currentHand);
 
 						} else if(!infoCenter.getPlayerIsLeader(p) && !infoCenter.getPlayerIsLastPlayer(p) &&
@@ -115,49 +111,77 @@ public class Daifugo {
 							// 
 							System.out.println("-------"+"Tricks "+(++trick)+"-------");
 							skipNumber = 0;
-							msg.isNewTrick = true;
-							msg.isTight = false;
-							msg.isUnderJackBack = false;
 							isTight = false;
 							isUnderJackBack = false;
+							isNewTrick = true;
 							currentHand = null;
 							infoCenter.setPlayerIsLeader(p);
-							infoCenter.setPlayerIsLastPlayer(p);
+							msg = new Message(i, Message.ACTION_LEADING, (Object)null, isUnderRevolution, isUnderJackBack, isTight);
+							updateInfo(players);
 							effectNumber = getAndCheckHand(infoCenter, players, p, currentHand);
+							infoCenter.setPlayerIsLastPlayer(p);
 
 						} else {
 							// 
 							// can skip or play hand
-							// 
-							msg.isNewTrick = false;
-							if(true) {
+							// 	
+							isNewTrick = false;
+							effectNumber = getAndCheckHand(infoCenter, players, p, currentHand);
+							if(effectNumber == -1) {
 								skipNumber++;
 							} else {
 								infoCenter.setPlayerIsLastPlayer(p);
-								effectNumber = getAndCheckHand(infoCenter, players, p, currentHand);
-								if(effectNumber == -1) {
-									skipNumber++;
-								} 
 							}
+							
 						}
 
-						if(infoCenter.getPlayerNoHand(p) && effectNumber != -7 && effectNumber != -10) {
-							if(infoCenter.getPlayingNumber() == nPlayer) {
+						if(effectNumber == -7 || effectNumber == -10) {
+
+							msg = new Message(i, Message.ACTION_LOSING, (Object)infoCenter.getPlayerHand(p), isUnderRevolution, isUnderJackBack, isTight);
+
+							int playing = infoCenter.getPlayingNumber() - 1;
+							infoCenter.setPlayerNoHand(p);
+							infoCenter.setPlayerStatus(p, infoCenter.getStatus(playing));
+
+							updateInfo(players);
+
+						} else if(infoCenter.getPlayerNoHand(p)) {
+							if(infoCenter.getPlayingNumber() == nPlayer-1) {
+
+								infoCenter.setPlayerStatus(p, infoCenter.getStatus());
+								msg = new Message(i, (short)(Message.ACTION_PLAYING | Message.ACTION_WINNING), (Object)currentHand, isUnderRevolution, isUnderJackBack, isTight);
+								updateInfo(players);
+
 								Player gm = infoCenter.getGrandMillionaire();
 								if(gm != null && gm != p) {
 									// 
 									// gm become EXTREME_NEEDY and no hand
 									// 
+									msg = new Message(players.indexOf(gm), Message.ACTION_LOSING, (Object)infoCenter.getPlayerHand(gm), isUnderRevolution, isUnderJackBack, isTight);
 									infoCenter.setPlayerStatus(gm, InfoCenter.EXTREME_NEEDY);
 									infoCenter.setPlayerNoHand(gm);
+									updateInfo(players);
 								} 
 							}
-							infoCenter.setPlayerStatus(p, infoCenter.getStatus());
+						} else {
+							if(effectNumber == -1) {
+								msg = new Message(i, Message.ACTION_PASSING, (Object)currentHand, isUnderRevolution, isUnderJackBack, isTight);
+							} else {
+								msg = new Message(i, Message.ACTION_PLAYING, (Object)currentHand, isUnderRevolution, isUnderJackBack, isTight);
+							}
+							updateInfo(players);
 						}
+
+						if(effectNumber == -8) {
+							i -= 1;
+						}
+
 						if(infoCenter.getPlayingNumber() == 1) {
 							Player lastPlayer = infoCenter.getLastPlayer();
+							msg = new Message(players.indexOf(lastPlayer), Message.ACTION_LOSING, (Object)infoCenter.getPlayerHand(lastPlayer), isUnderRevolution, isUnderJackBack, isTight);
 							infoCenter.setPlayerNoHand(lastPlayer);
 							infoCenter.setPlayerStatus(lastPlayer, infoCenter.getStatus());
+							updateInfo(players);
 						}
 					}
 				}
@@ -192,7 +216,7 @@ public class Daifugo {
 				}
 			}
 		}
-		if(!msg.isNewTrick) {
+		if(!isNewTrick) {
 			if(lastHand.isTight(newHand)) {
 				isTight = true;
 			}
@@ -207,9 +231,6 @@ public class Daifugo {
 				ArrayList<Card> giveCards = _player.give_up_card(_infoCenter.getPlayerHand(_player), effects.get("GiveSeven"));
 				int give = giveCards.size();
 				if(give != effects.get("GiveSeven")) {
-					int playing = _infoCenter.getPlayingNumber() - 1;
-					_infoCenter.setPlayerNoHand(_player);
-					_infoCenter.setPlayerStatus(_player, _infoCenter.getStatus(playing));
 					effectNumber = -7;
 					return effectNumber;
 				} else {
@@ -220,14 +241,12 @@ public class Daifugo {
 			if(effects.get("EndEight") > 0) {
 				_infoCenter.setPlayerIsLeader(_player);
 				_infoCenter.setPlayerIsLastPlayer(_player);
+				effectNumber = -8;
 			}
 			if(effects.get("AbandonTen") > 0) {
 				ArrayList<Card> giveCards = _player.give_up_card(_infoCenter.getPlayerHand(_player), effects.get("AbandonTen"));
 				int give = giveCards.size();
 				if(give != effects.get("AbandonTen")) {
-					int playing = _infoCenter.getPlayingNumber() - 1;
-					_infoCenter.setPlayerNoHand(_player);
-					_infoCenter.setPlayerStatus(_player, _infoCenter.getStatus(playing));
 					effectNumber = -10;
 					return effectNumber;
 				} else {
@@ -279,22 +298,21 @@ public class Daifugo {
 	public static int getAndCheckHand(InfoCenter _infoCenter, ArrayList<Player> _players, Player _player, Hand _currentHand) {
 		boolean success = false;
 		int chance = 5;
-		int effectNumber = 0;
+		int effectNumber = -1;
 		Hand playHand;
-		setMessage(_infoCenter, _players, _player, _currentHand, Message.BASIC);
 		if(_currentHand == null) {
 			while(!success) {
 				try {
-					_player.update_info(msg);
 					playHand = _player.play_card(_infoCenter.getPlayerHand(_player));
-					if(playHand.getType() == Hand.UNKNOWN || !_infoCenter.getPlayerHasThisHand(_player, playHand.getContent())) {
+
+					if(playHand.getType() == Hand.UNKNOWN || playHand.getType() == Hand.PASS || !_infoCenter.getPlayerHasThisHand(_player, playHand.getContent())) {
 						success = false;
-						setMessage(_infoCenter, _players, _player, _currentHand, Message.ERROR);
+						msg = new Message(_players.indexOf(_player), Message.ACTION_WRONG_TYPE, (Object)_currentHand, isUnderRevolution, isUnderJackBack, isTight);
+						updateInfo(_players);
 						System.out.println("Wrong Hand! Try again.");
 					} else {
 						_infoCenter.removePlayerHand(_player, playHand.getContent());
 						effectNumber = judge(_infoCenter, _players, _player, _currentHand, playHand);
-						setMessage(_infoCenter, _players, _player, _currentHand, Message.BASIC);
 						success = true;
 						_currentHand = playHand;
 					}
@@ -305,60 +323,41 @@ public class Daifugo {
 		} else {
 			while(chance-- > 0) {
 				try {
-					_player.update_info(msg);
 					playHand = _player.play_card(_infoCenter.getPlayerHand(_player));
+
 					if (canBeat(_currentHand.beats(playHand), _currentHand, playHand) && _infoCenter.getPlayerHasThisHand(_player, playHand.getContent())) {
 						_infoCenter.removePlayerHand(_player, playHand.getContent());
 						effectNumber = judge(_infoCenter, _players, _player, _currentHand, playHand);
-						setMessage(_infoCenter, _players, _player, _currentHand, Message.BASIC);
 						success = true;
 						_currentHand = playHand;
 						break;
 					} else if(_currentHand.getType() == Hand.UNKNOWN || !_infoCenter.getPlayerHasThisHand(_player, playHand.getContent())) {
 						success = false;
 						effectNumber = -1;
-						setMessage(_infoCenter, _players, _player, _currentHand, Message.ERROR);
-						System.out.println("Wrong Hand! Try again. You have "+chance+" time to try.");
+						msg = new Message(_players.indexOf(_player), Message.ACTION_WRONG_TYPE, (Object)_currentHand, isUnderRevolution, isUnderJackBack, isTight);
+						updateInfo(_players);
+						System.out.println("Wrong Hand! Try again. You have "+chance+" times to try.");
+					} else if(playHand.getType() == Hand.PASS) {
+						break;
 					} else {
 						success = false;
 						effectNumber = -1;
-						setMessage(_infoCenter, _players, _player, _currentHand, Message.ERROR);
-						System.out.println("Can't beat current hand! Try again. You have "+chance+" time to try.");
+						msg = new Message(_players.indexOf(_player), Message.ACTION_CANT_BEAT, (Object)_currentHand, isUnderRevolution, isUnderJackBack, isTight);
+						updateInfo(_players);
+						System.out.println("Can't beat current hand! Try again. You have "+chance+" times to try.");
 					}
 				} catch(Exception e) {
 					System.out.println("Something Wrong.");
 				}
 			}
-			setMessage(_infoCenter, _players, _player, _currentHand, Message.BASIC);
 		}
 		return effectNumber;
 	}
 
-	/**
-	 * to set message to new status
-	 * @param _infoCenter InfoCenter reference
-	 * @param _players ArrayList of Player reference
-	 * @param _player Crrent player reference
-	 * @param _currentHand current hand on table
-	 * @param _type type to be set
-	 */
-	public static void setMessage(InfoCenter _infoCenter, ArrayList<Player> _players, Player _player, Hand _currentHand, byte _type) {
-		msg.type = _type;
-		msg.lastPlayer = _players.indexOf(_infoCenter.getLastPlayedPlayer());
-		msg.lastHand = _currentHand;
-		msg.whoseTurn = _players.indexOf(_player);
-		boolean[] playing = new boolean[nPlayer];
+	public static void updateInfo(ArrayList<Player> _players) {
 		for(int i=0; i<nPlayer; i++) {
-			if(_infoCenter.getPlayerIsPlaying(_players.get(i))) {
-				playing[i] = true;
-			} else {
-				playing[i] = false;
-			}
+			_players.get(i).update_info(msg);
 		}
-		msg.playerStatus = playing;
-		msg.isUnderRevolution = isUnderRevolution;
-		msg.isUnderJackBack = isUnderJackBack;
-		msg.isTight = isTight;
 	}
 
 	/**
