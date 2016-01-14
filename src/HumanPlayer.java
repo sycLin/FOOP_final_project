@@ -148,9 +148,10 @@ class HumanPlayer extends Player{
 				System.out.println("You played wrong type of hand, please play your cards again.");
 			}
 			Hand lastHand;
-			if(msg.getContent() != null)
+			if(msg.getContent() != null) {
 				lastHand = (Hand)msg.getContent();
-			System.out.println("The last hand was " + lastHand.toString());
+				System.out.println("The last hand was " + lastHand.toString());
+			}
 		}
 		else if(msg.getType() == Message.BASIC) {
 			// The KING lost
