@@ -50,6 +50,15 @@ public class Daifugo {
 			msg = new Message(-1, Message.ACTION_NEW_ROUND, (Object)(r+1), isUnderRevolution, isUnderJackBack, isTight);
 			updateInfo(players);
 
+			String[] name = new String[nPlayer];
+			for(int i=0; i<nPlayer; i++) {
+				name[i] = players.get(i).get_name();
+			}
+			for(int i=0; i<nPlayer; i++) {
+				msg = new Message(i, Message.ACTION_UPDR_POS, (Object)name, isUnderRevolution, isUnderJackBack, isTight);
+				players.get(i).update_info(msg);
+			}
+
 			for(int i=0; i<nPlayer; i++) {
 				System.err.print(players.get(i).get_name()+" "+infoCenter.getPlayerStatus(players.get(i)));
 			}
@@ -223,7 +232,19 @@ public class Daifugo {
 				}
 			}
 			infoCenter.playersGetStatusScore();
+
+			int[] score = new int[nPlayer];
+			for(int i=0; i<nPlayer; i++) {
+				score[i] = infoCenter.getPlayerScore(players.get(i));
+			}
+			msg = new Message(-1, Message.ACTION_UPDT_SCORE, (Object)score, isUnderRevolution, isUnderJackBack, isTight);
+			updateInfo(players);
+
 		}
+
+		msg = new Message(-1, Message.ACTION_THE_END, (Object)null, isUnderRevolution, isUnderJackBack, isTight);
+		updateInfo(players);
+
 		System.out.println("===========================");
 		infoCenter.printResult();
 	}
