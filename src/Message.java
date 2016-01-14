@@ -53,13 +53,13 @@ class Message {
 	 * the position of the player who triggered this message,
 	 * (-1 if system triggered)
 	 */
-	private int player_position;
+	private int playerPosition;
 
 	/**
 	 * the action of the player at player_position did,
 	 * (use bit-wise operations with ACTION_XXX constants)
 	 */
-	public short action;
+	private short action;
 
 	/**
 	 * the content of the cards that triggered by specific effects,
@@ -89,7 +89,7 @@ class Message {
 	 */
 	public Message() {
 		type = BASIC;
-		player_position = -1;
+		playerPosition = -1;
 		action = ACTION_NOTHING;
 		content = null;
 		isUnderRevolution = false;
@@ -102,7 +102,7 @@ class Message {
 	 */
 	public Message(int pPosition, short theAction, Object theContent, boolean isR, boolean isJ, boolean isT) {
 		type = BASIC; // default message type: BASIC
-		player_position = pPosition;
+		playerPosition = pPosition;
 		action = theAction;
 		content = theContent;
 		isUnderRevolution = isR;
@@ -116,7 +116,7 @@ class Message {
 	 */
 	public Message(byte msgType, int pPosition, short theAction, Object theContent, boolean isR, boolean isJ, boolean isT) {
 		type = msgType;
-		player_position = pPosition;
+		playerPosition = pPosition;
 		action = theAction;
 		content = theContent;
 		isUnderRevolution = isR;
@@ -129,35 +129,18 @@ class Message {
 		return ret;
 	}
 
-	public int getCurrentPlayer() {
-		int ret = currentPlayer;
+	public int getPlayer() {
+		int ret = playerPosition;
 		return ret;
 	}
 
-	public Hand getCurrentHand() {
-		ArrayList<Card> cont = currentHand.getContent();
-		ArrayList<Card> joker = currentHand.getJokerContent();
-		return new Hand(cont, joker);
-	}
-
-	public ArrayList<Card> getContent() {
-		ArrayList<Card> ret = content;
+	public short getAction() {
+		short ret = action;
 		return ret;
 	}
 
-	public int getLastPlayer() {
-		int ret = lastPlayer;
-		return ret;
-	}
-
-	public Hand getLastHand() {
-		ArrayList<Card> cont = lastHand.getContent();
-		ArrayList<Card> joker = lastHand.getJokerContent();
-		return new Hand(cont, joker);
-	}
-
-	public int getNextPlayer() {
-		int ret = nextPlayer;
+	public Object getContent() {
+		Object ret = content;
 		return ret;
 	}
 
