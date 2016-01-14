@@ -27,7 +27,6 @@ class Message {
 	public static final short ACTION_PASSING	= (short)0b0000000000001000;
 	public static final short ACTION_LEADING	= (short)0b0000000000010000;
 	public static final short ACTION_NEW_ROUND	= (short)0b0000000000100000;
-	public static final short ACTION_ROUND_END	= (short)0b0000000001000000;
 	public static final short ACTION_CANT_BEAT	= (short)0b0000000010000000;
 	public static final short ACTION_WRONG_TYPE	= (short)0b0000000100000000;
 
