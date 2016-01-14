@@ -1,4 +1,4 @@
-
+package daifugo;
 import java.lang.*;
 import java.util.*;
 
