@@ -3,8 +3,17 @@ import java.lang.*;
 import java.util.*;
 
 class HumanPlayer extends Player{
+
+	// ----- constants ----- //
+	public static final int NEED_RESPONSE = 1;
+	public static final int DONT_NEED_RESPONSE = 2;
+
+	// ----- fields ----- //
+	private Socket mySocket;
+
 	public HumanPlayer() {
 		super();
+		mySocket = null;
 	}
 	public Hand play_card(ArrayList<Card> myCards) {
 		ArrayList<Card> retCards = new ArrayList<Card>();
@@ -272,6 +281,25 @@ class HumanPlayer extends Player{
 		}	
 		System.out.println("----------------------------");
 	}
+
+	/**
+	 * to receive a socket reference from Daifugo
+	 * @param _socket the socket got from Daifugo
+	 */
+	public void setSocket(Socket _socket) {
+		mySocket = _socket;
+	}
+
+	/**
+	 * to communicate with human
+	 * @param type either NEED_RESPONSE or DONT_NEED_RESPONSE (both pre-defined constants)
+	 * @param s the string to output
+	 */
+	private void outputWrapper(int type, String s) {
+		// TODO
+		;
+	}
+
 }
 
 
