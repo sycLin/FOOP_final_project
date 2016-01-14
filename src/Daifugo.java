@@ -464,6 +464,7 @@ public class Daifugo {
 
 		for(int i=0; i<nPlayer; i++) {
 			players.get(i).enter_name();
+			players.get(i).set_title(InfoCenter.COMMONER);
 		}
 	}
 
@@ -958,6 +959,7 @@ class InfoCenter {
 	public void setPlayerStatus(Player _player, byte status) {
 		int index = this.getPlayerIndex(_player);
 		this.playerStatus.set(index, status);
+		_player.set_title(status);
 	}
 
 	/**
