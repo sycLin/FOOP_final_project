@@ -337,7 +337,7 @@ public class Daifugo {
 
 					if(playHand.getType() == Hand.UNKNOWN || playHand.getType() == Hand.PASS || !_infoCenter.getPlayerHasThisHand(_player, playHand.getContent())) {
 						success = false;
-						msg = new Message(_players.indexOf(_player), Message.ACTION_WRONG_TYPE, (Object)currentHand, isUnderRevolution, isUnderJackBack, isTight);
+						msg = new Message(Message.ERROR, _players.indexOf(_player), Message.ACTION_WRONG_TYPE, (Object)currentHand, isUnderRevolution, isUnderJackBack, isTight);
 						updateInfo(_players);
 						System.out.println("Wrong Hand! Try again.");
 					} else {
@@ -364,7 +364,7 @@ public class Daifugo {
 					} else if(currentHand.getType() == Hand.UNKNOWN || !_infoCenter.getPlayerHasThisHand(_player, playHand.getContent())) {
 						success = false;
 						effectNumber = -1;
-						msg = new Message(_players.indexOf(_player), Message.ACTION_WRONG_TYPE, (Object)currentHand, isUnderRevolution, isUnderJackBack, isTight);
+						msg = new Message(Message.ERROR, _players.indexOf(_player), Message.ACTION_WRONG_TYPE, (Object)currentHand, isUnderRevolution, isUnderJackBack, isTight);
 						updateInfo(_players);
 						System.out.println("Wrong Hand! Try again. You have "+chance+" times to try.");
 					} else if(playHand.getType() == Hand.PASS) {
@@ -372,7 +372,7 @@ public class Daifugo {
 					} else {
 						success = false;
 						effectNumber = -1;
-						msg = new Message(_players.indexOf(_player), Message.ACTION_CANT_BEAT, (Object)currentHand, isUnderRevolution, isUnderJackBack, isTight);
+						msg = new Message(Message.ERROR, _players.indexOf(_player), Message.ACTION_CANT_BEAT, (Object)currentHand, isUnderRevolution, isUnderJackBack, isTight);
 						updateInfo(_players);
 						System.out.println("Can't beat current hand! Try again. You have "+chance+" times to try.");
 					}
