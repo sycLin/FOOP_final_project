@@ -2,7 +2,7 @@ package daifugo;
 import java.lang.*;
 import java.util.*;
 import java.io.*;
-import java.net.*
+import java.net.*;
 
 class HumanPlayer extends Player{
 

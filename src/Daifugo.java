@@ -251,14 +251,14 @@ public class Daifugo {
 		infoCenter.printResult();
 	}
 
-	// /**
-	//  * function to create socket connection with client
-	//  * @param _players ArrayList of Player reference
-	//  */
-	// public static void createConnection(ArrayList<Player> _players) {
-	// 	Server myServer = new Server(nHumanPlayer);
-	// 	ArrayList<Socket> mySocket = mySocket.startListen();
-	// }
+	/**
+	 * function to create socket connection with client
+	 * @param _players ArrayList of Player reference
+	 */
+	public static void createConnection(ArrayList<Player> _players) {
+		Server myServer = new Server(nHumanPlayer);
+		ArrayList<Socket> mySocket = mySocket.startListen();
+	}
 
 	/**
 	 * function to jude the effects of hand
