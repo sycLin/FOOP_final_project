@@ -6,9 +6,11 @@ import java.net.*;
 
 class Client {
 
+	public static final int SERVER_PORT = 5566;
+
 	public static void main(String[] argv) {
 		String host = "";
-		int port = 5566;
+		int port = SERVER_PORT;
 		Socket socket = null;
 		Scanner consoleInput = new Scanner(System.in);
 		System.out.print("Enter server address > ");
