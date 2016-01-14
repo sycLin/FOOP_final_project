@@ -20,6 +20,7 @@ class Message {
 	 * to indicate the action that triggers this message
 	 * (use bit-wise operation to access)
 	 */
+	public static final short ACTION_NOTHING	= (short)0b0000000000000000;
 	public static final short ACTION_PLAYING	= (short)0b0000000000000001;
 	public static final short ACTION_WINNING	= (short)0b0000000000000010;
 	public static final short ACTION_LOSING		= (short)0b0000000000000100;
@@ -49,34 +50,22 @@ class Message {
 	private byte type = BASIC;
 
 	/**
-	 * the position of the current playing player
+	 * the position of the player who triggered this message,
+	 * (-1 if system triggered)
 	 */
-	private int currentPlayer;
+	private int player_position;
 
 	/**
-	 * the hand of this player 
+	 * the action of the player at player_position did,
+	 * (use bit-wise operations with ACTION_XXX constants)
 	 */
-	private Hand currentHand;
+	public short action;
 
 	/**
-	 * the content of the cards that triggered by specific effects
+	 * the content of the cards that triggered by specific effects,
+	 * could be an instance of Hand, or ArrayList of Card.
 	 */
-	private ArrayList<Card> content;
-
-	/**
-	 * the position of the last player to play
-	 */
-	private int lastPlayer;
-
-	/**
-	 * the hand of last player 
-	 */
-	private Hand lastHand;
-
-	/**
-	 * the position of the next player to play
-	 */
-	private int nextPlayer;
+	private Object content;
 
 	/**
 	 * whether it's under revolution
