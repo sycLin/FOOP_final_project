@@ -13,10 +13,13 @@ class HumanPlayer extends Player{
 
 	// ----- fields ----- //
 	private Socket mySocket;
+	private String[] names;
+	private int myPosition;
 
 	public HumanPlayer() {
 		super();
 		mySocket = null;
+		names = new String[4];
 	}
 	public Hand play_card(ArrayList<Card> myCards) {
 		ArrayList<Card> retCards = new ArrayList<Card>();
@@ -27,7 +30,8 @@ class HumanPlayer extends Player{
 		Hand retHand;
 		
 		while(true) {
-			System.out.println("Your cards:");
+			System.out.println(names[myPosition] + ", your cards:");
+
 			print_cards(myCards);
 			System.out.println("Please enter the card indices you want to play.");
 			System.out.println("Or enter -1 to pass.");
@@ -150,14 +154,15 @@ class HumanPlayer extends Player{
 	}
 
 	public void update_info(Message msg) {
+		int thisP = msg.getPlayer();
 		if(msg.getType() == Message.ERROR) {
 			
 			print_status(msg);
 			if((msg.getAction() & Message.ACTION_CANT_BEAT) != 0) {
-				System.out.println("Your hand couldn't beat the last hand, please play your cards again.");
+				System.out.println(names[thisP] + ", your hand couldn't beat the last hand, please play your cards again.");
 			}
 			else if((msg.getAction() & Message.ACTION_WRONG_TYPE) != 0) {
-				System.out.println("You played wrong type of hand, please play your cards again.");
+				System.out.println(names[thisP] + ", you played wrong type of hand, please play your cards again.");
 			}
 			Hand lastHand;
 			if(msg.getContent() != null) {
@@ -166,26 +171,44 @@ class HumanPlayer extends Player{
 			}
 		}
 		else if(msg.getType() == Message.BASIC) {
-			// The KING lost
+			// The GRAND MILLIONAIRE lost
 			if((msg.getAction() & Message.ACTION_LOSING) != 0) {
-				ArrayList<Card> kingCards = (ArrayList<Card>)msg.getContent();
-				if(this.get_title() == InfoCenter.GRAND_MILLIONAIRE) {
-					System.out.println("The GRAND MILLIONAIRE lost, here are his remains.");	
+				if(thisP == myPosition) {
+					if(thisP == 1) {
+						System.out.println("You were the GRAND MILLIONAIRE, but someone won, so you lost.");
+					}
+					else {
+						System.out.println("For some reason, you lost.");
+					}
 				}
 				else {
-					System.out.println("Player at position " + msg.getPlayer() + " lost, here are his remains.");
+					ArrayList<Card> kingCards = (ArrayList<Card>)msg.getContent();
+					if(thisP == 1) {
+						System.out.println("The GRAND MILLIONAIRE lost, here are his remains.");	
+					}
+					else {
+						System.out.println(names[thisP] + "(" + thisP + ") lost, here are his remains.");
+					}
+					print_cards(kingCards);
 				}
-				print_cards(kingCards);
+				
 			}
 			// A person played his cards.
 			else if((msg.getAction() & Message.ACTION_PLAYING) != 0) {
-				Hand lastHand = (Hand)msg.getContent();
-				print_status(msg);
-				System.out.println("Player" + Integer.toString(msg.getPlayer()) + "'s hand was " + lastHand.toString());
-				
-				// Someone won.
-				if((msg.getAction() & Message.ACTION_WINNING) != 0) {
-					System.out.println("Player at position " + msg.getPlayer() + " won.");	
+				if(myPosition != thisP) {
+					Hand lastHand = (Hand)msg.getContent();
+					print_status(msg);
+					System.out.println(names[thisP] + "(" + thisP + ")'s hand was " + lastHand.toString());
+					
+					// Someone won.
+					if((msg.getAction() & Message.ACTION_WINNING) != 0) {
+						System.out.println(names[thisP] + "(" + thisP + ") won.");	
+					}	
+				}
+				else {
+					if((msg.getAction() & Message.ACTION_WINNING) != 0) {
+						System.out.println("You won!");	
+					}	
 				}
 			}
 
@@ -196,15 +219,17 @@ class HumanPlayer extends Player{
 			}
 			
 			else if((msg.getAction() & Message.ACTION_PASSING) != 0) {
-				Hand lastHand = (Hand)msg.getContent();
-				print_status(msg);
-				System.out.println("Player" + Integer.toString(msg.getPlayer()) + " passed");
-				System.out.println("The last hand was " + lastHand.toString());
-				
+				if(myPosition != thisP) {
+					Hand lastHand = (Hand)msg.getContent();
+					print_status(msg);
+					System.out.println(names[thisP] + "(" + thisP + ") passed");
+					System.out.println("The last hand was " + lastHand.toString());
+				}
 			}
 			else if((msg.getAction() & Message.ACTION_LEADING) != 0) {
+
 				System.out.println("----- Trick " + Integer.toString((int)msg.getContent()) + " -----");
-				System.out.println("The leader of this trick is position " + Integer.toString(msg.getPlayer()));
+				System.out.println("The leader of this trick is " + names[thisP] + "(" + thisP +")");
 			}
 			else if((msg.getAction() & Message.ACTION_EXCH_CARD) != 0) {
 				switch(this.get_title()) {
@@ -222,12 +247,39 @@ class HumanPlayer extends Player{
 						break;
 				}
 			}
+			
 			else if((msg.getAction() & Message.ACTION_ABAN_CARD) != 0) {
-				ArrayList<Card> abanCards = (ArrayList<Card>)msg.getContent();
-				System.out.println("Player at position " + msg.getPlayer() + " abandoned " + abanCards.size() + " cards.");
-				System.out.println("The abandoned cards are:");
-				print_cards(abanCards);
+				if(thisP != myPosition) {
+					ArrayList<Card> abanCards = (ArrayList<Card>)msg.getContent();
+					System.out.println(names[thisP] + "(" + thisP +") abandoned " + abanCards.size() + " cards.");
+					System.out.println("The abandoned cards are:");
+					print_cards(abanCards);	
+				}
+				
 			}
+			else if((msg.getAction() & Message.ACTION_UPDT_SCORE) != 0) {
+				int[] scores = (int[])msg.getContent();
+				System.out.println("------ SCORES ------");
+				for(int i = 0; i < 4; i ++) {
+					System.out.println(names[i] + ": " + scores[i]);
+				}
+			}
+			else if((msg.getAction() & Message.ACTION_UPDT_POS) != 0) {
+				myPosition = msg.getPlayer();
+				String[] tmpNames = (String[])msg.getContent();
+				
+				for(int i = 0; i < 4; i ++) {
+					
+					names[i] = tmpNames[i];	
+					System.out.println("Player at position " + i + ": " + names[i]);
+					System.out.println("Your position: " + myPosition);
+				}
+				
+			}
+			else if((msg.getAction() & Message.ACTION_THE_END) != 0) {
+				System.out.println("GAME OVER");	
+			}
+				
 		}
 	}
 	public void enter_name() {
@@ -344,7 +396,7 @@ class HumanPlayer extends Player{
 
 /**
  *	TODO LIST:
- *	1. When pass, any string includes "PASS", or "-1"	-----
+ *	1. When pass, any string includes "PASS", or "-1"	----- DONE
  *	2. fix the bugs of two space for split.      		----- DONE
  *	3. repetitive cards 								----- DONE
  *  4. print_cards()
