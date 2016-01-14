@@ -12,6 +12,8 @@ class HumanPlayer extends Player{
 
 	// ----- fields ----- //
 	private Socket mySocket;
+	private String[] names;
+	private int myPosition;
 
 	public HumanPlayer() {
 		super();
@@ -27,6 +29,7 @@ class HumanPlayer extends Player{
 		
 		while(true) {
 			System.out.println("Your cards:");
+
 			print_cards(myCards);
 			System.out.println("Please enter the card indices you want to play.");
 			System.out.println("Or enter -1 to pass.");
@@ -165,7 +168,7 @@ class HumanPlayer extends Player{
 			}
 		}
 		else if(msg.getType() == Message.BASIC) {
-			// The KING lost
+			// The GRAND MILLIONAIRE lost
 			if((msg.getAction() & Message.ACTION_LOSING) != 0) {
 				ArrayList<Card> kingCards = (ArrayList<Card>)msg.getContent();
 				if(this.get_title() == InfoCenter.GRAND_MILLIONAIRE) {
@@ -227,6 +230,29 @@ class HumanPlayer extends Player{
 				System.out.println("The abandoned cards are:");
 				print_cards(abanCards);
 			}
+			// else if((msg.getAction() & Message.ACTION_UPDT_SCORE) != 0) {
+			// 	System.out.println("123");
+			// 	int[] scores = (int[])msg.getContent();
+			// 	System.out.println("------ SCORES ------");
+			// 	for(int i = 0; i < 4; i ++) {
+			// 		System.out.println(names[i] + ": " + scores[i]);
+			// 	}
+			// }
+			// else if((msg.getAction() & Message.ACTION_UPDT_POS) != 0) {
+			// 	System.out.println("123");
+			// 	myPosition = msg.getPlayer();
+			// 	System.out.println("456");
+			// 	String[] tmpNames = (String[])msg.getContent();
+			// 	System.out.println("123");
+			// 	for(int i = 0; i < 4; i ++) {
+			// 		names[i] = tmpNames[i];	
+			// 	}
+				
+			// }
+			// else if((msg.getAction() & Message.ACTION_THE_END) != 0) {
+			// 	System.out.println("GAME OVER");	
+			// }
+				
 		}
 	}
 	public void enter_name() {
@@ -307,7 +333,7 @@ class HumanPlayer extends Player{
 
 /**
  *	TODO LIST:
- *	1. When pass, any string includes "PASS", or "-1"	-----
+ *	1. When pass, any string includes "PASS", or "-1"	----- DONE
  *	2. fix the bugs of two space for split.      		----- DONE
  *	3. repetitive cards 								----- DONE
  *  4. print_cards()
