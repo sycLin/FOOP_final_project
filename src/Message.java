@@ -32,7 +32,8 @@ class Message {
 	public static final short ACTION_EXCH_CARD	= (short)0b0000001000000000;
 	public static final short ACTION_ABAN_CARD	= (short)0b0000010000000000;
 	public static final short ACTION_UPDT_SCORE	= (short)0b0000100000000000;
-	public static final short ACTION_THE_END	= (short)0b0001000000000000;
+	public static final short ACTION_UPDT_POS	= (short)0b0001000000000000;
+	public static final short ACTION_THE_END	= (short)0b0010000000000000;
 
 	// ----- fields ----- //
 
