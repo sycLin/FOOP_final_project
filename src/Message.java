@@ -99,6 +99,12 @@ class Message {
 
 	/**
 	 * to construct a message containing basic information
+	 * @param pPosition the player position
+	 * @param theAction the action took by the player
+	 * @param theContent the content of the action
+	 * @param isR whether under revolution or not
+	 * @param isJ whether under Jack back or not
+	 * @param isT whether being tight or not
 	 */
 	public Message(int pPosition, short theAction, Object theContent, boolean isR, boolean isJ, boolean isT) {
 		type = BASIC; // default message type: BASIC
@@ -112,7 +118,13 @@ class Message {
 
 	/**
 	 * to construct a message to inform player of his/her erroneus move
-	 * @param errMsg the error message
+	 * @param msgType the type of this message
+	 * @param pPosition the player position
+	 * @param theAction the action took by the player
+	 * @param theContent the content of the action
+	 * @param isR whether under revolution or not
+	 * @param isJ whether under Jack back or not
+	 * @param isT whether being tight or not
 	 */
 	public Message(byte msgType, int pPosition, short theAction, Object theContent, boolean isR, boolean isJ, boolean isT) {
 		type = msgType;
