@@ -9,6 +9,7 @@ class HumanPlayer extends Player{
 	// ----- constants ----- //
 	public static final int NEED_RESPONSE = 1;
 	public static final int DONT_NEED_RESPONSE = 2;
+	private static final String MAGIC_TOKEN = "[m0therfucker]";
 
 	// ----- fields ----- //
 	private Socket mySocket;
@@ -296,10 +297,46 @@ class HumanPlayer extends Player{
 	 * to communicate with human
 	 * @param type either NEED_RESPONSE or DONT_NEED_RESPONSE (both pre-defined constants)
 	 * @param s the string to output
+	 * @return a string of response, will return an empty string if DONT_NEED_RESPONSE
 	 */
-	private void outputWrapper(int type, String s) {
-		// TODO
-		;
+	private String outputWrapper(int type, String s) {
+		String ret = "";
+		DataInputStream input = null;
+		DataOutputStream output = null;
+		// write to socket
+		try {
+			output = new DataOutputStream(mySocket.getOutputStream());
+			if(type == NEED_RESPONSE)
+				output.writeUTF(MAGIC_TOKEN + s); // need magic token if want response
+			else
+				output.writeUTF(s);
+			output.flush();
+		} catch(IOException e) {
+			e.printStackTrace();
+		} finally {
+			// close the output stream
+			try {
+				output.close();
+			} catch(Exception e) {
+				e.printStackTrace();
+			}
+		}
+		// get response
+		if(type == NEED_RESPONSE) {
+			try {
+				input = new DataInputStream(mySocket.getInputStream());
+				ret = input.readUTF();
+			} catch(IOException e) {
+				e.printStackTrace();
+			} finally {
+				try {
+					input.close();
+				} catch(Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return ret;
 	}
 
 }
