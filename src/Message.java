@@ -31,6 +31,7 @@ class Message {
 	public static final short ACTION_WRONG_TYPE	= (short)0b0000000100000000;
 	public static final short ACTION_EXCH_CARD	= (short)0b0000001000000000;
 	public static final short ACTION_ABAN_CARD	= (short)0b0000010000000000;
+	public static final short ACTION_THE_END	= (short)0b0000100000000000;
 
 	// ----- fields ----- //
 
