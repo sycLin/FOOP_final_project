@@ -288,7 +288,7 @@ public class Daifugo {
 				return effectNumber;
 			} else {
 				_infoCenter.removePlayerHand(_player, giveCards);
-				msg = new Message(_players.indexOf(_player), (short)(Message.ACTION_PLAYING | Message.ACTION_ABAN_CARD), (Object)giveCards, isUnderRevolution, isUnderJackBack, isTight);
+				msg = new Message(_players.indexOf(_player), Message.ACTION_ABAN_CARD, (Object)giveCards, isUnderRevolution, isUnderJackBack, isTight);
 				updateInfo(_players);
 			}
 		}
