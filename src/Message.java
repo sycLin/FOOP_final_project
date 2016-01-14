@@ -135,6 +135,11 @@ class Message {
 		return ret;
 	}
 
+	public short getAction() {
+		short ret = action;
+		return ret;
+	}
+
 	public Object getContent() {
 		Object ret = content;
 		return ret;
