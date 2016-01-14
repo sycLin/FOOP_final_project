@@ -109,8 +109,65 @@ class HumanPlayer extends Player{
 		return retCards;
 	}
 	public void update_info(Message msg) {
-		// update_info will also be called when all people pass.
-		
+		if(msg.getType() == Message.ERROR) {
+			Hand lastHand = (Hand)msg.getContent();
+			if((msg.getAction() & Message.ACTION_CANT_BEAT) != 0) {
+				System.out.println("Your hand couldn't beat the last hand, please play your cards again.");
+			}
+			else if((msg.getAction() & Message.ACTION_WRONG_TYPE) != 0) {
+				System.out.println("You played wrong type of hand, please play your cards again.");
+			}
+			System.out.println("The last hand was " + lastHand.toString());
+		}
+		else if(msg.getType() == Message.BASIC) {
+			// The KING lost
+			if((msg.getAction() & Message.ACTION_LOSING) != 0) {
+				ArrayList<Card> kingCards = (ArrayList<Card>)msg.getContent();
+				System.out.println("The KING lost, here are his remains.");
+				printCards(kingCards);
+			}
+			// A person played his cards.
+			else if((msg.getAction() & Message.ACTION_PLAYING) != 0) {
+				Hand lastHand = (Hand)msg.getContent();
+				System.out.println("Player" + Integer.toString(msg.getPlayer()) + "'s hand was " + lastHand.toString());
+				// Someone won.
+				if((msg.getAction() & Message.ACTION_WINNING) != 0) {
+					System.out.println("Player at position " + msg.getPlayer() + "won.");	
+				}
+			}
+
+			else if((msg.getAction() & Message.ACTION_NEW_ROUND) != 0) {
+				System.out.println("-----------");
+				System.out.println("| Round " + Integer.toString((int)msg.getContent()) + " |");
+				System.out.println("-----------");
+			}
+			
+			else if((msg.getAction() & Message.ACTION_PASSING) != 0) {
+				Hand lastHand = (Hand)msg.getContent();
+				System.out.println("Player" + Integer.toString(msg.getPlayer()) + " passed");
+				System.out.println("The last hand was " + lastHand.toString());
+			}
+			else if((msg.getAction() & Message.ACTION_LEADING) != 0) {
+				System.out.println("----- Trick " + Integer.toString((int)msg.getContent()) + " -----");
+				System.out.println("The leader of this trick is position " + Integer.toString(msg.getPlayer()));
+			}
+			else if((msg.getAction() & Message.ACTION_EXCH_CARD) != 0) {
+				switch(this.get_title()) {
+					case InfoCenter.GRAND_MILLIONAIRE:
+						System.out.println("You are the GRAND MILLIONAIRE, now it's your turn to give up two cards.");
+						break;
+					case InfoCenter.MILLIONAIRE:
+						System.out.println("You are the MILLIONAIRE, now it's your turn to give up one cards.");	
+						break;
+					case InfoCenter.NEEDY:
+						System.out.println("You are the NEEDY, now it's your turn to give up one cards.");		
+						break;
+					case InfoCenter.EXTREME_NEEDY:
+						System.out.println("You are the EXTREME NEEDY, now it's your turn to give up two cards.");
+						break;
+				}
+			}
+		}
 	}
 	public void enter_name() {
 		Scanner scanner = new Scanner(System.in);
@@ -132,3 +189,10 @@ class HumanPlayer extends Player{
 		System.out.println("");
 	}
 }
+
+
+/**
+ *	TODO LIST:
+ *	1. When pass, any string includes "PASS", or "-1"
+ *	2. fix the bugs of two space for split.
+ */
