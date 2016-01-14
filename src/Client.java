@@ -4,7 +4,7 @@ import java.util.concurrent.*;
 import java.io.*;
 import java.net.*;
 
-public class Client {
+class Client {
 
 	public static void main(String[] argv) {
 		String host = "";
