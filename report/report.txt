@@ -1,0 +1,30 @@
+
+the report should consist of 7 parts
+
+Part 1: Names and IDs
+=====================
+B01902028 Shu-Ho, Chou.
+B01902044 Yu-Chih, Lin.
+B01902068 Brian Huang.
+B01902078 Han-Hao, Chen.
+
+Part 2: How to Divide the Responsibilities
+==========================================
+
+
+Part 3: Relations Between the Classes
+=====================================
+
+Part 4: Advantages of Our Design
+================================
+
+Part 5: Disadvantages of Our Design
+===================================
+
+Part 6: Packages We Used
+========================
+
+Part 7: How to Play Our Game
+============================
+
+
