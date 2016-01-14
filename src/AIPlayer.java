@@ -2,21 +2,20 @@ package daifugo;
 import java.lang.*;
 import java.util.*;
 
-class HumanPlayer extends Player{
-	public HumanPlayer() {
+class AIPlayer extends Player{
+	public AIPlayer() {
 		super();
 	}
 	public Hand play_card(ArrayList<Card> myCards) {
 		ArrayList<Card> retCards = new ArrayList<Card>();
 		ArrayList<Card> jokerAs = new ArrayList<Card>();
-		ArrayList<Integer> records = new ArrayList<Integer>();
 		Scanner scanner = new Scanner(System.in);
 		Collections.sort(myCards);
 		Hand retHand;
 		
 		while(true) {
 			System.out.println("Your cards:");
-			print_cards(myCards);
+			printCards(myCards);
 			System.out.println("Please enter the cards you want to play.");
 			String input = scanner.nextLine();
 			String[] cardIndices = input.split(" ");
@@ -28,20 +27,9 @@ class HumanPlayer extends Player{
 			}
 			try {	
 				for(int i = 0; i < cardIndices.length; i ++) {
-					if(cardIndices[i].equals("")) {
-						continue;
-					}
-					int idx = Integer.parseInt(cardIndices[i]);
-					records.add(idx);
-					Card tmp = myCards.get(idx);
+					Card tmp = myCards.get(Integer.parseInt(cardIndices[i]));
 					retCards.add(tmp);
 					jokerNum += (tmp.getRank() == 0) ? 1 : 0;
-				}
-				if(repeat_record(records)) {
-					records.clear();
-					retCards.clear();
-					System.out.println("DON'T CHEAT! Please enter distinct cards!");
-					continue;
 				}
 				for(int i = 0; i < retCards.size(); i ++) {
 					System.out.println(retCards.get(i).toString());
@@ -94,14 +82,12 @@ class HumanPlayer extends Player{
 		}
 		ArrayList<Card> retCards = new ArrayList<Card>();
 		Scanner scanner = new Scanner(System.in);
-		ArrayList<Integer> records = new ArrayList<Integer>();
 		System.out.println("Please give up " + number + " cards.");
 		Collections.sort(myCards);
 
-
 		while(true) {
 			System.out.println("Your cards:");
-			print_cards(myCards);
+			printCards(myCards);
 			System.out.println("Please enter the cards you want to give up.");
 			String input = scanner.nextLine();
 			String[] cardIndices = input.split(" ");
@@ -111,18 +97,7 @@ class HumanPlayer extends Player{
 			}
 			try {	
 				for(int i = 0; i < cardIndices.length; i ++) {
-					if(cardIndices[i].equals("")) {
-						continue;
-					}
-					int idx = Integer.parseInt(cardIndices[i]);
-					retCards.add(myCards.get(idx));
-					records.add(idx);
-				}
-				if(repeat_record(records)) {
-					records.clear();
-					retCards.clear();
-					System.out.println("DON'T CHEAT! Please give up distinct cards.");
-					continue;
+					retCards.add(myCards.get(Integer.parseInt(cardIndices[i])));	
 				}
 			}
 			catch(Exception ex) {
@@ -133,7 +108,6 @@ class HumanPlayer extends Player{
 		}
 		return retCards;
 	}
-
 	public void update_info(Message msg) {
 		if(msg.getType() == Message.ERROR) {
 			Hand lastHand = (Hand)msg.getContent();
@@ -143,7 +117,6 @@ class HumanPlayer extends Player{
 			else if((msg.getAction() & Message.ACTION_WRONG_TYPE) != 0) {
 				System.out.println("You played wrong type of hand, please play your cards again.");
 			}
-			print_status(msg);
 			System.out.println("The last hand was " + lastHand.toString());
 		}
 		else if(msg.getType() == Message.BASIC) {
@@ -151,13 +124,12 @@ class HumanPlayer extends Player{
 			if((msg.getAction() & Message.ACTION_LOSING) != 0) {
 				ArrayList<Card> kingCards = (ArrayList<Card>)msg.getContent();
 				System.out.println("The KING lost, here are his remains.");
-				print_cards(kingCards);
+				printCards(kingCards);
 			}
 			// A person played his cards.
 			else if((msg.getAction() & Message.ACTION_PLAYING) != 0) {
 				Hand lastHand = (Hand)msg.getContent();
 				System.out.println("Player" + Integer.toString(msg.getPlayer()) + "'s hand was " + lastHand.toString());
-				print_status(msg);
 				// Someone won.
 				if((msg.getAction() & Message.ACTION_WINNING) != 0) {
 					System.out.println("Player at position " + msg.getPlayer() + "won.");	
@@ -174,7 +146,6 @@ class HumanPlayer extends Player{
 				Hand lastHand = (Hand)msg.getContent();
 				System.out.println("Player" + Integer.toString(msg.getPlayer()) + " passed");
 				System.out.println("The last hand was " + lastHand.toString());
-				print_status(msg);
 			}
 			else if((msg.getAction() & Message.ACTION_LEADING) != 0) {
 				System.out.println("----- Trick " + Integer.toString((int)msg.getContent()) + " -----");
@@ -196,12 +167,6 @@ class HumanPlayer extends Player{
 						break;
 				}
 			}
-			else if((msg.getAction() & Message.ACTION_ABAN_CARD) != 0) {
-				ArrayList<Card> abanCards = (ArrayList<Card>)msg.getContent();
-				System.out.println("Player at position " + msg.getPlayer() + " abandoned " + abanCards.size() + " cards.");
-				System.out.println("The abandoned cards are:");
-				print_cards(abanCards);
-			}
 		}
 	}
 	public void enter_name() {
@@ -217,53 +182,17 @@ class HumanPlayer extends Player{
 			break;
 		}
 	}
-	private void print_cards(ArrayList<Card> myCards) {
+	private void printCards(ArrayList<Card> myCards) {
 		for(int i = 0; i < myCards.size(); i ++) {
 			System.out.print("(" + i + ")" + myCards.get(i).toString());
 		}
 		System.out.println("");
-	}
-	private boolean repeat_record(ArrayList<Integer> records) {
-		Collections.sort(records);
-		for(int i = 0; i < records.size() - 1; i ++) {
-			if(records.get(i) == records.get(i + 1)) {
-				return true;
-			}
-		}
-		return false;
-	}
-	private void print_status(Message msg) {
-		System.out.println("---------- STATUS ----------");
-		
-		System.out.print("| isUnderRevolution: " + msg.isUnderRevolution());
-		if(msg.isUnderRevolution()) {
-			System.out.println("  |");
-		}
-		else {
-			System.out.println(" |");	
-		}
-		System.out.print("| isUnderJackBack:   " + msg.isUnderJackBack());
-		if(msg.isUnderJackBack()) {
-			System.out.println("  |");
-		}
-		else {
-			System.out.println(" |");	
-		}	
-		System.out.print("| isTight:           " + msg.isTight());
-		if(msg.isTight()) {
-			System.out.println("  |");
-		}
-		else {
-			System.out.println(" |");	
-		}	
-		System.out.println("----------------------------");
 	}
 }
 
 
 /**
  *	TODO LIST:
- *	1. When pass, any string includes "PASS", or "-1"	-----
- *	2. fix the bugs of two space for split.      		----- DONE
- *	3. repetitive cards 								----- DONE
+ *	1. When pass, any string includes "PASS", or "-1"
+ *	2. fix the bugs of two space for split.
  */
