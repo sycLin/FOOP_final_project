@@ -163,7 +163,7 @@ public class Daifugo {
 						}
 
 						if(effectNumber == -7 || effectNumber == -10) {
-
+							skipNumber = 0;
 							msg = new Message(i, Message.ACTION_LOSING, (Object)infoCenter.getPlayerHand(p), isUnderRevolution, isUnderJackBack, isTight);
 
 							int playing = infoCenter.getPlayingNumber() - 1;
@@ -201,6 +201,7 @@ public class Daifugo {
 						}
 
 						if(effectNumber == -8) {
+							skipNumber = 0;
 							i -= 1;
 							if(infoCenter.getPlayerNoHand(p)) {
 								int playerIndex = players.indexOf(p);
