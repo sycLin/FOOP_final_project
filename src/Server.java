@@ -60,9 +60,5 @@ class Server {
 		return ret;
 	}
 
-	public static void main(String[] argv) {
-		Server server = new Server();
-		server.listenRequest();
-	}
 
 }
