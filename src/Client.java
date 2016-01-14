@@ -33,7 +33,7 @@ class Client {
 							output.writeUTF(consoleInput.nextLine());
 							output.flush();
 						} else { // dont need response
-							System.out.println(s);
+							System.out.println(tmp_string);
 						}
 					} catch(Exception e1) {
 						// nothing coming in from server-end
