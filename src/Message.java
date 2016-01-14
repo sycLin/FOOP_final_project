@@ -152,11 +152,6 @@ class Message {
 		return ret;
 	}
 
-	public short getAction() {
-		short ret = action;
-		return ret;
-	}
-
 	public Object getContent() {
 		Object ret = content;
 		return ret;
@@ -179,20 +174,14 @@ class Message {
 
 	public String toString() {
 		String ret = "";
-		
-		/* should be modified accordingly, so I commented out the below */
-
-		// String[] typeList = {"", "BASIC", "ERROR"};
-		// ret += ("TYPE: " + typeList[(int)type] + '\n');
-		// ret += ("current Player: " + currentPlayer + '\n');
-		// ret += ("current Hand: " + currentHand + '\n');
-		// ret += ("content: " + content + '\n');
-		// ret += ("last Player: " + lastPlayer + '\n');
-		// ret += ("last Hand: " + lastHand + '\n');
-		// ret += ("next Player: " + nextPlayer + '\n');
-		// ret += ("revolution: " + isUnderRevolution + '\n');
-		// ret += ("jackback: " + isUnderJackBack + '\n');
-		// ret += ("tight: " + isTight + '\n');
+		String[] typeList = {"", "BASIC", "ERROR"};
+		ret += ("TYPE: " + typeList[(int)type] + '\n');
+		ret += ("playerPosition: " + playerPosition + '\n');
+		ret += ("action: " + action + '\n');
+		ret += ("content: " + content + '\n');
+		ret += ("revolution: " + isUnderRevolution + '\n');
+		ret += ("jackback: " + isUnderJackBack + '\n');
+		ret += ("tight: " + isTight + '\n');
 		return ret;
 	}
 }
