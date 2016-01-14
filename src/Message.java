@@ -49,6 +49,11 @@ class Message {
 	private byte type = BASIC;
 
 	/**
+	 * the type of this message: BASIC or ERROR (initially BASIC)
+	 */
+	private short action;
+
+	/**
 	 * the position of the current playing player
 	 */
 	private int currentPlayer;
@@ -98,7 +103,8 @@ class Message {
 	/**
 	 * to construct a message containing basic information
 	 */
-	public Message(int cPlayer, Hand cHand, int lPlayer, Hand lHand, ArrayList<Card> cont, int nPlayer, boolean isR, boolean isJ, boolean isT) {
+	public Message(short act, int cPlayer, Hand cHand, int lPlayer, Hand lHand, ArrayList<Card> cont, int nPlayer, boolean isR, boolean isJ, boolean isT) {
+		action = act;
 		currentPlayer = cPlayer;
 		if (cHand != null)
 			currentHand = new Hand(cHand.getContent());
@@ -120,9 +126,14 @@ class Message {
 	 * to construct a message to inform player of his/her erroneus move
 	 * @param errMsg the error message
 	 */
-	public Message(byte errMsg, int cPlayer, Hand cHand, int lPlayer, Hand lHand, ArrayList<Card> cont, int nPlayer, boolean isR, boolean isJ, boolean isT) {
-		this(cPlayer, cHand, lPlayer, lHand, cont, nPlayer, isR, isJ, isT);
+	public Message(byte errMsg, short act, int cPlayer, Hand cHand, int lPlayer, Hand lHand, ArrayList<Card> cont, int nPlayer, boolean isR, boolean isJ, boolean isT) {
+		this(act, cPlayer, cHand, lPlayer, lHand, cont, nPlayer, isR, isJ, isT);
 		this.type = errMsg;
+	}
+
+	public short getAction() {
+		short ret = action;
+		return ret;
 	}
 
 	public byte getType() {
@@ -181,6 +192,7 @@ class Message {
 		String ret = "";
 		String[] typeList = {"", "BASIC", "ERROR"};
 		ret += ("TYPE: " + typeList[(int)type] + '\n');
+		ret += ("action: " + action + '\n');
 		ret += ("current Player: " + currentPlayer + '\n');
 		ret += ("current Hand: " + currentHand + '\n');
 		ret += ("content: " + content + '\n');
