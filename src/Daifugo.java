@@ -523,7 +523,7 @@ public class Daifugo {
 			players.add(new HumanPlayer());
 		}
 
-		// createConnection(players);
+		createConnection(players);
 
 		for(int i=0; i<nPlayer; i++) {
 			players.get(i).enter_name();
