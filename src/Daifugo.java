@@ -1094,6 +1094,9 @@ class InfoCenter {
 				break;
 			}
 		}
+		for(int i=0; i<_cards.size(); i++) {
+			hand.add(_cards.get(i));
+		}
 		return status;
 	}
 
