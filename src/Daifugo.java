@@ -259,7 +259,8 @@ public class Daifugo {
 		Server myServer = new Server(nHumanPlayer);
 		ArrayList<Socket> mySocket = myServer.startListen();
 		for(int i=0; i<nHumanPlayer; i++) {
-			players.get(i).setSocket(mySocket.get(i));
+			HumanPlayer dummy = (HumanPlayer)_players.get(i);
+			dummy.setSocket(mySocket.get(i));
 		}
 	}
 
