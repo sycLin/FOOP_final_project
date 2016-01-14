@@ -162,11 +162,11 @@ public class Daifugo {
 							updateInfo(players);
 
 						} else if(infoCenter.getPlayerNoHand(p)) {
-
-								infoCenter.setPlayerStatus(p, infoCenter.getStatus());
-								System.err.println(p.get_name()+" get "+infoCenter.getPlayerStatus(p)+" status.");
-								msg = new Message(i, (short)(Message.ACTION_PLAYING | Message.ACTION_WINNING), (Object)currentHand, isUnderRevolution, isUnderJackBack, isTight);
-								updateInfo(players);
+							skipNumber = 0;
+							infoCenter.setPlayerStatus(p, infoCenter.getStatus());
+							System.err.println(p.get_name()+" get "+infoCenter.getPlayerStatus(p)+" status.");
+							msg = new Message(i, (short)(Message.ACTION_PLAYING | Message.ACTION_WINNING), (Object)currentHand, isUnderRevolution, isUnderJackBack, isTight);
+							updateInfo(players);
 							if(infoCenter.getPlayingNumber() == nPlayer-1) {
 
 								Player gm = infoCenter.getGrandMillionaire();
