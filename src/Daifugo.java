@@ -57,7 +57,7 @@ public class Daifugo {
 				name[i] = players.get(i).get_name();
 			}
 			for(int i=0; i<nPlayer; i++) {
-				msg = new Message(i, Message.ACTION_UPDT_SCORE, (Object)name, isUnderRevolution, isUnderJackBack, isTight);
+				msg = new Message(i, Message.ACTION_UPDT_POS, (Object)name, isUnderRevolution, isUnderJackBack, isTight);
 				players.get(i).update_info(msg);
 			}
 
