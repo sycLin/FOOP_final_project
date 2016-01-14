@@ -30,13 +30,13 @@ class HumanPlayer extends Player{
 		Hand retHand;
 		
 		while(true) {
-			System.out.println(names[myPosition] + ", your cards:");
+			output_wrapper(DONT_NEED_RESPONSE, names[myPosition] + ", your cards:");
 
 			print_cards(myCards);
-			System.out.println("Please enter the card indices you want to play.");
-			System.out.println("Or enter -1 to pass.");
+			output_wrapper(DONT_NEED_RESPONSE, "Please enter the card indices you want to play.");
+			String input = output_wrapper(NEED_RESPONSE, "Or enter -1 to pass.");
 
-			String input = scanner.nextLine();
+			//String input = scanner.nextLine();
 			String[] cardIndices = input.split(" ");
 			int jokerNum = 0;
 			// PASS
@@ -58,26 +58,26 @@ class HumanPlayer extends Player{
 				if(repeat_record(records)) {
 					records.clear();
 					retCards.clear();
-					System.out.println("DON'T CHEAT! Please enter distinct cards!");
+					output_wrapper(DONT_NEED_RESPONSE, "DON'T CHEAT! Please enter distinct cards!");
 					continue;
 				}
 				for(int i = 0; i < retCards.size(); i ++) {
-					System.out.println(retCards.get(i).toString());
+					output_wrapper(DONT_NEED_RESPONSE, retCards.get(i).toString());
 				}
 			}
 			catch(Exception ex) {
-				System.out.println("Please enter integer within 0 ~ " + Integer.toString(myCards.size() - 1));
+				output_wrapper(DONT_NEED_RESPONSE, "Please enter integer within 0 ~ " + Integer.toString(myCards.size() - 1));
 
 				continue;
 			}
 			if(jokerNum > 0) {
 				while(true) {
-					System.out.println("You have " + jokerNum + " jokers.");
-					System.out.println("What do you want your jokers be?");
-					input = scanner.nextLine();
+					output_wrapper(DONT_NEED_RESPONSE, "You have " + jokerNum + " jokers.");
+					input = output_wrapper(NEED_RESPONSE, "What do you want your jokers be?");
+					//input = scanner.nextLine();
 					String[] cards = input.split(" ");
 					if(cards.length != jokerNum) {
-						System.out.println("Number not matched. Please enter again.");
+						output_wrapper(DONT_NEED_RESPONSE, "Number not matched. Please enter again.");
 						continue;
 					}
 					try {
@@ -86,7 +86,7 @@ class HumanPlayer extends Player{
 						}
 					}
 					catch(Exception ex) {
-						System.out.println("Wrong card format, please enter again.");
+						output_wrapper(DONT_NEED_RESPONSE, "Wrong card format, please enter again.");
 						continue;
 					}
 					break;
@@ -98,7 +98,7 @@ class HumanPlayer extends Player{
 				retHand = new Hand(retCards);	
 			}
 			if(retHand.getType() == Hand.UNKNOWN) {
-				System.out.println("Type unknown");
+				output_wrapper(DONT_NEED_RESPONSE, "Type unknown");
 				retCards.clear();
 				records.clear();
 				continue;
@@ -114,18 +114,18 @@ class HumanPlayer extends Player{
 		ArrayList<Card> retCards = new ArrayList<Card>();
 		Scanner scanner = new Scanner(System.in);
 		ArrayList<Integer> records = new ArrayList<Integer>();
-		System.out.println("Please give up " + number + " cards.");
+		output_wrapper(DONT_NEED_RESPONSE, "Please give up " + number + " cards.");
 		Collections.sort(myCards);
 
 
 		while(true) {
-			System.out.println("Your cards:");
+			output_wrapper(DONT_NEED_RESPONSE, names[myPosition] + ", your cards:");
 			print_cards(myCards);
-			System.out.println("Please enter the cards you want to give up.");
-			String input = scanner.nextLine();
+			String input = output_wrapper(NEED_RESPONSE, "Please enter the cards you want to give up.");
+			//String input = scanner.nextLine();
 			String[] cardIndices = input.split(" ");
 			if(cardIndices.length != number) {
-				System.out.println("Please enter " + number + " cards.");
+				output_wrapper(DONT_NEED_RESPONSE, "Please enter " + number + " cards.");
 				continue;
 			}
 			try {	
@@ -140,12 +140,12 @@ class HumanPlayer extends Player{
 				if(repeat_record(records)) {
 					records.clear();
 					retCards.clear();
-					System.out.println("DON'T CHEAT! Please give up distinct cards.");
+					output_wrapper(DONT_NEED_RESPONSE, "DON'T CHEAT! Please give up distinct cards.");
 					continue;
 				}
 			}
 			catch(Exception ex) {
-				System.out.println("Please enter integers within 0 ~ " + Integer.toString(myCards.size() - 1));
+				output_wrapper(DONT_NEED_RESPONSE, "Please enter integers within 0 ~ " + Integer.toString(myCards.size() - 1));
 				continue;
 			}
 			break;
@@ -159,15 +159,15 @@ class HumanPlayer extends Player{
 			
 			print_status(msg);
 			if((msg.getAction() & Message.ACTION_CANT_BEAT) != 0) {
-				System.out.println(names[thisP] + ", your hand couldn't beat the last hand, please play your cards again.");
+				output_wrapper(DONT_NEED_RESPONSE, names[thisP] + ", your hand couldn't beat the last hand, please play your cards again.");
 			}
 			else if((msg.getAction() & Message.ACTION_WRONG_TYPE) != 0) {
-				System.out.println(names[thisP] + ", you played wrong type of hand, please play your cards again.");
+				output_wrapper(DONT_NEED_RESPONSE, names[thisP] + ", you played wrong type of hand, please play your cards again.");
 			}
 			Hand lastHand;
 			if(msg.getContent() != null) {
 				lastHand = (Hand)msg.getContent();
-				System.out.println("The last hand was " + lastHand.toString());
+				output_wrapper(DONT_NEED_RESPONSE, "The last hand was " + lastHand.toString());
 			}
 		}
 		else if(msg.getType() == Message.BASIC) {
@@ -175,19 +175,19 @@ class HumanPlayer extends Player{
 			if((msg.getAction() & Message.ACTION_LOSING) != 0) {
 				if(thisP == myPosition) {
 					if(thisP == 1) {
-						System.out.println("You were the GRAND MILLIONAIRE, but someone won, so you lost.");
+						output_wrapper(DONT_NEED_RESPONSE, "You were the GRAND MILLIONAIRE, but someone won, so you lost.");
 					}
 					else {
-						System.out.println("For some reason, you lost.");
+						output_wrapper(DONT_NEED_RESPONSE, "For some reason, you lost.");
 					}
 				}
 				else {
 					ArrayList<Card> kingCards = (ArrayList<Card>)msg.getContent();
 					if(thisP == 1) {
-						System.out.println("The GRAND MILLIONAIRE lost, here are his remains.");	
+						output_wrapper(DONT_NEED_RESPONSE, "The GRAND MILLIONAIRE lost, here are his remains.");	
 					}
 					else {
-						System.out.println(names[thisP] + "(" + thisP + ") lost, here are his remains.");
+						output_wrapper(DONT_NEED_RESPONSE, names[thisP] + "(" + thisP + ") lost, here are his remains.");
 					}
 					print_cards(kingCards);
 				}
@@ -198,16 +198,16 @@ class HumanPlayer extends Player{
 				if(myPosition != thisP) {
 					Hand lastHand = (Hand)msg.getContent();
 					print_status(msg);
-					System.out.println(names[thisP] + "(" + thisP + ")'s hand was " + lastHand.toString());
+					output_wrapper(DONT_NEED_RESPONSE, names[thisP] + "(" + thisP + ")'s hand was " + lastHand.toString());
 					
 					// Someone won.
 					if((msg.getAction() & Message.ACTION_WINNING) != 0) {
-						System.out.println(names[thisP] + "(" + thisP + ") won.");	
+						output_wrapper(DONT_NEED_RESPONSE, names[thisP] + "(" + thisP + ") won.");	
 					}	
 				}
 				else {
 					if((msg.getAction() & Message.ACTION_WINNING) != 0) {
-						System.out.println("You won!");	
+						output_wrapper(DONT_NEED_RESPONSE, "You won!");	
 					}	
 				}
 			}
@@ -216,35 +216,35 @@ class HumanPlayer extends Player{
 				String tmpLine = "-----------" + "\n" + "| Round " + 
 							Integer.toString((int)msg.getContent()) + " |\n"
 							+ "-----------";
-				System.out.println(tmpLine);
+				output_wrapper(DONT_NEED_RESPONSE, tmpLine);
 			}
 			
 			else if((msg.getAction() & Message.ACTION_PASSING) != 0) {
 				if(myPosition != thisP) {
 					Hand lastHand = (Hand)msg.getContent();
 					print_status(msg);
-					System.out.println(names[thisP] + "(" + thisP + ") passed");
-					System.out.println("The last hand was " + lastHand.toString());
+					output_wrapper(DONT_NEED_RESPONSE, names[thisP] + "(" + thisP + ") passed");
+					output_wrapper(DONT_NEED_RESPONSE, "The last hand was " + lastHand.toString());
 				}
 			}
 			else if((msg.getAction() & Message.ACTION_LEADING) != 0) {
 
-				System.out.println("----- Trick " + Integer.toString((int)msg.getContent()) + " -----");
-				System.out.println("The leader of this trick is " + names[thisP] + "(" + thisP +")");
+				output_wrapper(DONT_NEED_RESPONSE, "----- Trick " + Integer.toString((int)msg.getContent()) + " -----");
+				output_wrapper(DONT_NEED_RESPONSE, "The leader of this trick is " + names[thisP] + "(" + thisP +")");
 			}
 			else if((msg.getAction() & Message.ACTION_EXCH_CARD) != 0) {
 				switch(this.get_title()) {
 					case InfoCenter.GRAND_MILLIONAIRE:
-						System.out.println("You are the GRAND MILLIONAIRE, now it's your turn to give up two cards.");
+						output_wrapper(DONT_NEED_RESPONSE, "You are the GRAND MILLIONAIRE, now it's your turn to give up two cards.");
 						break;
 					case InfoCenter.MILLIONAIRE:
-						System.out.println("You are the MILLIONAIRE, now it's your turn to give up one cards.");	
+						output_wrapper(DONT_NEED_RESPONSE, "You are the MILLIONAIRE, now it's your turn to give up one cards.");	
 						break;
 					case InfoCenter.NEEDY:
-						System.out.println("You are the NEEDY, now it's your turn to give up one cards.");		
+						output_wrapper(DONT_NEED_RESPONSE, "You are the NEEDY, now it's your turn to give up one cards.");		
 						break;
 					case InfoCenter.EXTREME_NEEDY:
-						System.out.println("You are the EXTREME NEEDY, now it's your turn to give up two cards.");
+						output_wrapper(DONT_NEED_RESPONSE, "You are the EXTREME NEEDY, now it's your turn to give up two cards.");
 						break;
 				}
 			}
@@ -252,17 +252,17 @@ class HumanPlayer extends Player{
 			else if((msg.getAction() & Message.ACTION_ABAN_CARD) != 0) {
 				if(thisP != myPosition) {
 					ArrayList<Card> abanCards = (ArrayList<Card>)msg.getContent();
-					System.out.println(names[thisP] + "(" + thisP +") abandoned " + abanCards.size() + " cards.");
-					System.out.println("The abandoned cards are:");
+					output_wrapper(DONT_NEED_RESPONSE, names[thisP] + "(" + thisP +") abandoned " + abanCards.size() + " cards.");
+					output_wrapper(DONT_NEED_RESPONSE, "The abandoned cards are:");
 					print_cards(abanCards);	
 				}
 				
 			}
 			else if((msg.getAction() & Message.ACTION_UPDT_SCORE) != 0) {
 				int[] scores = (int[])msg.getContent();
-				System.out.println("------ SCORES ------");
+				output_wrapper(DONT_NEED_RESPONSE, "------ SCORES ------");
 				for(int i = 0; i < 4; i ++) {
-					System.out.println(names[i] + ": " + scores[i]);
+					output_wrapper(DONT_NEED_RESPONSE, names[i] + ": " + scores[i]);
 				}
 			}
 			else if((msg.getAction() & Message.ACTION_UPDT_POS) != 0) {
@@ -272,13 +272,13 @@ class HumanPlayer extends Player{
 				for(int i = 0; i < 4; i ++) {
 					
 					names[i] = tmpNames[i];	
-					System.out.println("Player at position " + i + ": " + names[i]);
-					System.out.println("Your position: " + myPosition);
+					output_wrapper(DONT_NEED_RESPONSE, "Player at position " + i + ": " + names[i]);
+					output_wrapper(DONT_NEED_RESPONSE, "Your position: " + myPosition);
 				}
 				
 			}
 			else if((msg.getAction() & Message.ACTION_THE_END) != 0) {
-				System.out.println("GAME OVER");	
+				output_wrapper(DONT_NEED_RESPONSE, "GAME OVER");	
 			}
 				
 		}
@@ -286,10 +286,10 @@ class HumanPlayer extends Player{
 	public void enter_name() {
 		Scanner scanner = new Scanner(System.in);
 		while(true) {
-			System.out.println("Please enter your name:");
-			String tmp = scanner.nextLine();
+			String tmp = output_wrapper(NEED_RESPONSE, "Please enter your name:");
+			//String tmp = scanner.nextLine();
 			if(tmp.length() > Player.MAX_NAME_LENGTH) {
-				System.out.println("Please enter name length smaller than 50.");
+				output_wrapper(DONT_NEED_RESPONSE, "Please enter name length smaller than 50.");
 				continue;
 			}
 			name = tmp;
@@ -301,7 +301,7 @@ class HumanPlayer extends Player{
 		for(int i = 0; i < myCards.size(); i ++) {
 			tmpLine += "(" + i + ")" + myCards.get(i).toString();
 		}
-		System.out.println(tmpLine);
+		output_wrapper(DONT_NEED_RESPONSE, tmpLine);
 	}
 	private boolean repeat_record(ArrayList<Integer> records) {
 		Collections.sort(records);
@@ -314,7 +314,7 @@ class HumanPlayer extends Player{
 	}
 	private void print_status(Message msg) {
 		String tmpLine = "";
-		System.out.println("---------- STATUS ----------");
+		output_wrapper(DONT_NEED_RESPONSE, "---------- STATUS ----------");
 		tmpLine += "| isUnderRevolution: " + msg.isUnderRevolution();
 		tmpLine += msg.isUnderRevolution() ? "  |\n" : " |\n";
 		
@@ -325,7 +325,7 @@ class HumanPlayer extends Player{
 		tmpLine += msg.isTight() ? "  |\n" : " |\n";
 		
 		tmpLine += 	"----------------------------";
-		System.out.println(tmpLine);
+		output_wrapper(DONT_NEED_RESPONSE, tmpLine);
 	}
 
 	/**
@@ -342,7 +342,7 @@ class HumanPlayer extends Player{
 	 * @param s the string to output
 	 * @return a string of response, will return an empty string if DONT_NEED_RESPONSE
 	 */
-	private String outputWrapper(int type, String s) {
+	private String output_wrapper(int type, String s) {
 		String ret = "";
 		DataInputStream input = null;
 		DataOutputStream output = null;
