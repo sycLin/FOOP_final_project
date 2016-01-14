@@ -30,6 +30,7 @@ class Message {
 	public static final short ACTION_CANT_BEAT	= (short)0b0000000010000000;
 	public static final short ACTION_WRONG_TYPE	= (short)0b0000000100000000;
 	public static final short ACTION_EXCH_CARD	= (short)0b0000001000000000;
+	public static final short ACTION_ABAN_CARD	= (short)0b0000010000000000;
 
 	// ----- fields ----- //
 
