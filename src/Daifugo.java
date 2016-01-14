@@ -257,7 +257,7 @@ public class Daifugo {
 	 */
 	public static void createConnection(ArrayList<Player> _players) {
 		Server myServer = new Server(nHumanPlayer);
-		ArrayList<Socket> mySocket = mySocket.startListen();
+		ArrayList<Socket> mySocket = myServer.startListen();
 	}
 
 	/**
@@ -296,7 +296,7 @@ public class Daifugo {
 		if(newHand.getType() == Hand.FOUR_OF_A_KIND) {
 			isUnderRevolution = !isUnderRevolution;
 		}
-		
+
 		if(effects.get("SkipFive") > 0) {
 			effectNumber = effects.get("SkipFive");
 		}
@@ -398,7 +398,7 @@ public class Daifugo {
 						_infoCenter.removePlayerHand(_player, playHand.getContent());
 						effectNumber = judge(_infoCenter, _players, _player, currentHand, playHand);
 						success = true;
-						currentHand = new Hand(playHand.getContent());
+						currentHand = playHand;
 					}
 				} catch(Exception e) {
 					System.out.println("Something Wrong.");
