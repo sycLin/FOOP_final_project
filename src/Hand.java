@@ -106,10 +106,10 @@ class Hand {
 				return false;
 
 		// compare the power
-		if (getPower() > another_hand.getPower())
-			return true;
-		else if (getPower() < another_hand.getPower())
+		if (getPower() < another_hand.getPower())
 			return false;
+		else if (getPower() > another_hand.getPower())
+			return true;
 		else {
 			if (hasJoker() && !(another_hand.hasJoker())) {
 				return true;

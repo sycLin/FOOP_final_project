@@ -3,7 +3,7 @@ import java.lang.*;
 import java.util.*;
 
 class HumanPlayer extends Player{
-	HumanPlayer() {
+	public HumanPlayer() {
 		super();
 	}
 	public Hand play_card(ArrayList<Card> myCards) {

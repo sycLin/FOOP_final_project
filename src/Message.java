@@ -27,21 +27,8 @@ class Message {
 	public static final short ACTION_PASSING	= (short)0b0000000000001000;
 	public static final short ACTION_LEADING	= (short)0b0000000000010000;
 	public static final short ACTION_NEW_ROUND	= (short)0b0000000000100000;
-	public static final short ACTION_ROUND_END	= (short)0b0000000001000000;
 	public static final short ACTION_CANT_BEAT	= (short)0b0000000010000000;
 	public static final short ACTION_WRONG_TYPE	= (short)0b0000000100000000;
-
-	/**
-	 * to indicate the occasions of the game
-	 * (use bit-wise operation to access)
-	 */
-	public static final short WHEN_WINNING	= (short)0b0000000000000011;
-	public static final short WHEN_LOSING	= (short)0b0000000000000100;
-	public static final short WHEN_PLAY		= (short)0b0000000000000001;
-	public static final short NEW_TRICK		= (short)0b0000000000001000;
-	public static final short ROUND_START	= (short)0b0000000000010000;
-	public static final short ROUND_END		= (short)0b0000000000100000;
-	public static final short SOMETHING_BAD	= (short)0b0000000011000000;
 
 	// ----- fields ----- //
 
@@ -135,11 +122,6 @@ class Message {
 		isUnderRevolution = isR;
 		isUnderJackBack = isJ;
 		isTight = isT;
-	}
-
-	public short getAction() {
-		short ret = action;
-		return ret;
 	}
 
 	public byte getType() {
