@@ -213,9 +213,10 @@ class HumanPlayer extends Player{
 			}
 
 			else if((msg.getAction() & Message.ACTION_NEW_ROUND) != 0) {
-				System.out.println("-----------");
-				System.out.println("| Round " + Integer.toString((int)msg.getContent()) + " |");
-				System.out.println("-----------");
+				String tmpLine = "-----------" + "\n" + "| Round " + 
+							Integer.toString((int)msg.getContent()) + " |\n"
+							+ "-----------";
+				System.out.println(tmpLine);
 			}
 			
 			else if((msg.getAction() & Message.ACTION_PASSING) != 0) {
@@ -296,10 +297,11 @@ class HumanPlayer extends Player{
 		}
 	}
 	private void print_cards(ArrayList<Card> myCards) {
+		String tmpLine = "";
 		for(int i = 0; i < myCards.size(); i ++) {
-			System.out.print("(" + i + ")" + myCards.get(i).toString());
+			tmpLine += "(" + i + ")" + myCards.get(i).toString();
 		}
-		System.out.println("");
+		System.out.println(tmpLine);
 	}
 	private boolean repeat_record(ArrayList<Integer> records) {
 		Collections.sort(records);
@@ -311,30 +313,19 @@ class HumanPlayer extends Player{
 		return false;
 	}
 	private void print_status(Message msg) {
+		String tmpLine = "";
 		System.out.println("---------- STATUS ----------");
+		tmpLine += "| isUnderRevolution: " + msg.isUnderRevolution();
+		tmpLine += msg.isUnderRevolution() ? "  |\n" : " |\n";
 		
-		System.out.print("| isUnderRevolution: " + msg.isUnderRevolution());
-		if(msg.isUnderRevolution()) {
-			System.out.println("  |");
-		}
-		else {
-			System.out.println(" |");	
-		}
-		System.out.print("| isUnderJackBack:   " + msg.isUnderJackBack());
-		if(msg.isUnderJackBack()) {
-			System.out.println("  |");
-		}
-		else {
-			System.out.println(" |");	
-		}	
-		System.out.print("| isTight:           " + msg.isTight());
-		if(msg.isTight()) {
-			System.out.println("  |");
-		}
-		else {
-			System.out.println(" |");	
-		}	
-		System.out.println("----------------------------");
+		tmpLine += "| isUnderJackBack:   " + msg.isUnderJackBack();
+		tmpLine += msg.isUnderJackBack() ? "  |\n" : " |\n";
+		
+		tmpLine += 	"| isTight:           " + msg.isTight();
+		tmpLine += msg.isTight() ? "  |\n" : " |\n";
+		
+		tmpLine += 	"----------------------------";
+		System.out.println(tmpLine);
 	}
 
 	/**
