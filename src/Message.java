@@ -85,21 +85,26 @@ class Message {
 	// ----- actions ----- //
 
 	/**
+	 * to construct a dummy message
+	 */
+	public Message() {
+		type = BASIC;
+		player_position = -1;
+		action = ACTION_NOTHING;
+		content = null;
+		isUnderRevolution = false;
+		isUnderJackBack = false;
+		isTight = false;
+	}
+
+	/**
 	 * to construct a message containing basic information
 	 */
-	public Message(int cPlayer, Hand cHand, int lPlayer, Hand lHand, ArrayList<Card> cont, int nPlayer, boolean isR, boolean isJ, boolean isT) {
-		currentPlayer = cPlayer;
-		if (cHand != null)
-			currentHand = new Hand(cHand.getContent());
-		else 
-			currentHand = new Hand(new ArrayList<Card>());
-		lastPlayer = lPlayer;
-		if (lHand != null)
-			lastHand = new Hand(lHand.getContent());
-		else
-			lastHand = new Hand(new ArrayList<Card>());
-		content = cont;
-		nextPlayer = nPlayer;
+	public Message(int pPosition, short theAction, Object theContent, boolean isR, boolean isJ, boolean isT) {
+		type = BASIC; // default message type: BASIC
+		player_position = pPosition;
+		action = theAction;
+		content = theContent;
 		isUnderRevolution = isR;
 		isUnderJackBack = isJ;
 		isTight = isT;
@@ -109,9 +114,14 @@ class Message {
 	 * to construct a message to inform player of his/her erroneus move
 	 * @param errMsg the error message
 	 */
-	public Message(byte errMsg, int cPlayer, Hand cHand, int lPlayer, Hand lHand, ArrayList<Card> cont, int nPlayer, boolean isR, boolean isJ, boolean isT) {
-		this(cPlayer, cHand, lPlayer, lHand, cont, nPlayer, isR, isJ, isT);
-		this.type = errMsg;
+	public Message(byte msgType, int pPosition, short theAction, Object theContent, boolean isR, boolean isJ, boolean isT) {
+		type = msgType;
+		player_position = pPosition;
+		action = theAction;
+		content = theContent;
+		isUnderRevolution = isR;
+		isUnderJackBack = isJ;
+		isTight = isT;
 	}
 
 	public byte getType() {
