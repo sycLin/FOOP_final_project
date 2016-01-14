@@ -4,7 +4,9 @@ all:
 run:
 	java -cp bin/:lib/ daifugo.Daifugo 2>/dev/null
 run-dev:
-	java -cp bin/:lib/ daifugo.Daifugo
+	java -cp bin/:lib/ daifugo.Daifugo 2>system.log
+run-client:
+	java -cp bin/:lib/ daifugo.Client
 doc-gen:
 	javadoc -private -d doc/ src/*.java
 clean:
