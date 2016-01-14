@@ -139,7 +139,7 @@ class HumanPlayer extends Player{
 
 	public void update_info(Message msg) {
 		if(msg.getType() == Message.ERROR) {
-			Hand lastHand = (Hand)msg.getContent();
+			
 			print_status(msg);
 			if((msg.getAction() & Message.ACTION_CANT_BEAT) != 0) {
 				System.out.println("Your hand couldn't beat the last hand, please play your cards again.");
@@ -147,7 +147,9 @@ class HumanPlayer extends Player{
 			else if((msg.getAction() & Message.ACTION_WRONG_TYPE) != 0) {
 				System.out.println("You played wrong type of hand, please play your cards again.");
 			}
-			
+			Hand lastHand;
+			if(msg.getContent() != null)
+				lastHand = (Hand)msg.getContent();
 			System.out.println("The last hand was " + lastHand.toString());
 		}
 		else if(msg.getType() == Message.BASIC) {
