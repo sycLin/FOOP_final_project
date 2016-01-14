@@ -1,10 +1,11 @@
+package daifugo;
 import java.lang.*;
 import java.util.*;
 import java.util.concurrent.*;
 import java.io.*;
 import java.net.*;
 
-public class Server {
+class Server {
 
 	public static final int PORT_NUM = 5566;
 
