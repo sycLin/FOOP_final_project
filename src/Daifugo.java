@@ -288,7 +288,7 @@ public class Daifugo {
 				return effectNumber;
 			} else {
 				_infoCenter.removePlayerHand(_player, giveCards);
-				msg = Message(_players.indexOf(_player), (short)(Message.ACTION_PLAYING | Message.ACTION_ABAN_CARD), (Object)giveCards, isUnderRevolution, isUnderJackBack, isTight);
+				msg = new Message(_players.indexOf(_player), (short)(Message.ACTION_PLAYING | Message.ACTION_ABAN_CARD), (Object)giveCards, isUnderRevolution, isUnderJackBack, isTight);
 				updateInfo(_players);
 			}
 		}
@@ -315,10 +315,10 @@ public class Daifugo {
 		} else if(beats && newHand.hasJoker() && lastHand.getPower() == newHand.getPower()) {
 			;
 		} else if(lastHand.getType() == newHand.getType()) {
-			if(isUnderRevolution) {
+			if(isUnderRevolution && lastHand.getType() == newHand.getType() && lastHand.getPower() != newHand.getPower()) {
 				truth = !truth;
 			}
-			if(isUnderJackBack) {
+			if(isUnderJackBack && lastHand.getType() == newHand.getType() && lastHand.getPower() != newHand.getPower()) {
 				truth = !truth;
 			}
 		} else {
