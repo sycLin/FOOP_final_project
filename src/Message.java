@@ -137,6 +137,11 @@ class Message {
 		isTight = isT;
 	}
 
+	public short getAction() {
+		short ret = action;
+		return ret;
+	}
+
 	public byte getType() {
 		byte ret = type;
 		return ret;
