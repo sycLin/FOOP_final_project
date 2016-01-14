@@ -191,6 +191,22 @@ public class Daifugo {
 
 						if(effectNumber == -8) {
 							i -= 1;
+							if(infoCenter.getPlayerNoHand(p)) {
+								int playerIndex = players.indexOf(p);
+								int cur = playerIndex;
+								Player nextPlayer = null;
+								while(true) {
+									cur = (cur+1)%nPlayer;
+									if(cur != playerIndex) {
+										nextPlayer = players.get(cur);
+										if(!infoCenter.getPlayerNoHand(nextPlayer)) {
+											break;
+										}
+									}
+								}
+								infoCenter.setPlayerIsLeader(nextPlayer);
+								infoCenter.setPlayerIsLastPlayer(nextPlayer);
+							}
 						}
 
 						System.err.println("effectNumber: "+effectNumber);
