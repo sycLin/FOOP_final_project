@@ -288,6 +288,8 @@ public class Daifugo {
 				return effectNumber;
 			} else {
 				_infoCenter.removePlayerHand(_player, giveCards);
+				msg = Message(_players.indexOf(_player), (short)(Message.ACTION_PLAYING | Message.ACTION_ABAN_CARD), (Object)giveCards, isUnderRevolution, isUnderJackBack, isTight);
+				updateInfo(_players);
 			}
 		}
 		if(effects.get("JackBack") > 0) {
