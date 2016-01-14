@@ -151,7 +151,7 @@ class Hand {
 		}
 	}
 
-	public byte countPower(ArrayList<Card> cards) {
+	private byte countPower(ArrayList<Card> cards) {
 		byte ret = 0;
 		byte tmp = 0;
 		for (int i = 0; i < cards.size(); i++) {
