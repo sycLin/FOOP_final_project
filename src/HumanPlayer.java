@@ -17,12 +17,14 @@ class HumanPlayer extends Player{
 		while(true) {
 			System.out.println("Your cards:");
 			print_cards(myCards);
-			System.out.println("Please enter the cards you want to play.");
+			System.out.println("Please enter the card indices you want to play.");
+			System.out.println("Or enter -1 to pass.");
+
 			String input = scanner.nextLine();
 			String[] cardIndices = input.split(" ");
 			int jokerNum = 0;
 			// PASS
-			if(cardIndices.length == 0) {
+			if(cardIndices.length == 0 || cardIndices[0].equals("-1")) {
 				retHand = new Hand(retCards);
 				break;
 			}
@@ -82,6 +84,7 @@ class HumanPlayer extends Player{
 			if(retHand.getType() == Hand.UNKNOWN) {
 				System.out.println("Type unknown");
 				retCards.clear();
+				records.clear();
 				continue;
 			}
 			break;
@@ -137,30 +140,37 @@ class HumanPlayer extends Player{
 	public void update_info(Message msg) {
 		if(msg.getType() == Message.ERROR) {
 			Hand lastHand = (Hand)msg.getContent();
+			print_status(msg);
 			if((msg.getAction() & Message.ACTION_CANT_BEAT) != 0) {
 				System.out.println("Your hand couldn't beat the last hand, please play your cards again.");
 			}
 			else if((msg.getAction() & Message.ACTION_WRONG_TYPE) != 0) {
 				System.out.println("You played wrong type of hand, please play your cards again.");
 			}
-			print_status(msg);
+			
 			System.out.println("The last hand was " + lastHand.toString());
 		}
 		else if(msg.getType() == Message.BASIC) {
 			// The KING lost
 			if((msg.getAction() & Message.ACTION_LOSING) != 0) {
 				ArrayList<Card> kingCards = (ArrayList<Card>)msg.getContent();
-				System.out.println("The KING lost, here are his remains.");
+				if(this.get_title() == InfoCenter.GRAND_MILLIONAIRE) {
+					System.out.println("The GRAND MILLIONAIRE lost, here are his remains.");	
+				}
+				else {
+					System.out.println("Player at position " + msg.getPlayer() + " lost, here are his remains.");
+				}
 				print_cards(kingCards);
 			}
 			// A person played his cards.
 			else if((msg.getAction() & Message.ACTION_PLAYING) != 0) {
 				Hand lastHand = (Hand)msg.getContent();
-				System.out.println("Player" + Integer.toString(msg.getPlayer()) + "'s hand was " + lastHand.toString());
 				print_status(msg);
+				System.out.println("Player" + Integer.toString(msg.getPlayer()) + "'s hand was " + lastHand.toString());
+				
 				// Someone won.
 				if((msg.getAction() & Message.ACTION_WINNING) != 0) {
-					System.out.println("Player at position " + msg.getPlayer() + "won.");	
+					System.out.println("Player at position " + msg.getPlayer() + " won.");	
 				}
 			}
 
@@ -172,9 +182,10 @@ class HumanPlayer extends Player{
 			
 			else if((msg.getAction() & Message.ACTION_PASSING) != 0) {
 				Hand lastHand = (Hand)msg.getContent();
+				print_status(msg);
 				System.out.println("Player" + Integer.toString(msg.getPlayer()) + " passed");
 				System.out.println("The last hand was " + lastHand.toString());
-				print_status(msg);
+				
 			}
 			else if((msg.getAction() & Message.ACTION_LEADING) != 0) {
 				System.out.println("----- Trick " + Integer.toString((int)msg.getContent()) + " -----");
@@ -266,4 +277,5 @@ class HumanPlayer extends Player{
  *	1. When pass, any string includes "PASS", or "-1"	-----
  *	2. fix the bugs of two space for split.      		----- DONE
  *	3. repetitive cards 								----- DONE
+ *  4. print_cards()
  */
