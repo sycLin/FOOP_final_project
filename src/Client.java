@@ -25,12 +25,16 @@ class Client {
 			try {
 				input = new DataInputStream(socket.getInputStream());
 				output = new DataOutputStream(socket.getOutputStream());
-				while(true) {
+				while(input.available()>0) {
 					try {
-						// show the message from server on screen
-						System.out.println(input.readUTF());
-						// get user input and send it to server
-						output.writeUTF(consoleInput.nextLine());
+						String tmp_string = input.readUTF();
+						if(tmp_string.startsWith(MAGIC_TOKEN)) { // need response
+							System.out.println(tmp_string.substring(MAGIC_TOKEN.length()));
+							output.writeUTF(consoleInput.nextLine());
+							output.flush();
+						} else { // dont need response
+							System.out.println(s);
+						}
 					} catch(Exception e1) {
 						// nothing coming in from server-end
 						// sleep half a second to prevent from polling
