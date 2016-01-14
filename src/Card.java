@@ -85,6 +85,60 @@ final class Card implements Comparable<Card> {
 		return rank;
 	}
 
+	/**
+	 * to check if rank is bigger (more powerful)
+	 * @param another_card the card to compare with
+	 * @return true if bigger, false if equal or smaller.
+	 */
+	public boolean isBiggerThan(Card another_card) {
+		byte myRank = getRank();
+		byte yourRank = another_card.getRank();
+		// processing myRank (if Ace, 2, or Joker)
+		if(myRank == 1) // Ace
+			myRank = 14;
+		else if(myRank == 2) // 2
+			myRank = 15;
+		else if(myRank == 0) // Joker
+			myRank = 16;
+		// processing yourRank (if Ace, 2, or Joker)
+		if(yourRank == 1) // Ace
+			yourRank = 14;
+		else if(yourRank == 2) // 2
+			yourRank = 15;
+		else if(yourRank == 0) // Joker
+			yourRank = 16;
+		// comparing
+		if(myRank > yourRank) return true;
+		return false;
+	}
+
+	/**
+	 * to check if rank is smaller (less powerful)
+	 * @param another_card the card to compare with
+	 * @return true if smaller, false if equal or bigger.
+	 */
+	public boolean isSmallerThan(Card another_card) {
+		byte myRank = getRank();
+		byte yourRank = another_card.getRank();
+		// processing myRank (if Ace, 2, or Joker)
+		if(myRank == 1) // Ace
+			myRank = 14;
+		else if(myRank == 2) // 2
+			myRank = 15;
+		else if(myRank == 0) // Joker
+			myRank = 16;
+		// processing yourRank (if Ace, 2, or Joker)
+		if(yourRank == 1) // Ace
+			yourRank = 14;
+		else if(yourRank == 2) // 2
+			yourRank = 15;
+		else if(yourRank == 0) // Joker
+			yourRank = 16;
+		// comparing
+		if(myRank < yourRank) return true;
+		return false;
+	}
+
 	public int compareTo(Card another_card) {
 		// handle Joker cases
 		if(getRank() == 0)
