@@ -57,7 +57,7 @@ public class Daifugo {
 				name[i] = players.get(i).get_name();
 			}
 			for(int i=0; i<nPlayer; i++) {
-				msg = new Message(i, Message.ACTION_UPDT_SCORE, (Object)name, isUnderRevolution, isUnderJackBack, isTight);
+				msg = new Message(i, Message.ACTION_UPDT_POS, (Object)name, isUnderRevolution, isUnderJackBack, isTight);
 				players.get(i).update_info(msg);
 			}
 
@@ -258,6 +258,9 @@ public class Daifugo {
 	public static void createConnection(ArrayList<Player> _players) {
 		Server myServer = new Server(nHumanPlayer);
 		ArrayList<Socket> mySocket = myServer.startListen();
+		for(int i=0; i<nHumanPlayer; i++) {
+			players.get(i).setSocket(mySocket.get(i));
+		}
 	}
 
 	/**
@@ -517,6 +520,8 @@ public class Daifugo {
 			// players.add(new AIPlayer());
 			players.add(new HumanPlayer());
 		}
+
+		// createConnection(players);
 
 		for(int i=0; i<nPlayer; i++) {
 			players.get(i).enter_name();
