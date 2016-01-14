@@ -9,6 +9,7 @@ class HumanPlayer extends Player{
 	// ----- constants ----- //
 	public static final int NEED_RESPONSE = 1;
 	public static final int DONT_NEED_RESPONSE = 2;
+	private static final String MAGIC_TOKEN = "[m0therfucker]";
 
 	// ----- fields ----- //
 	private Socket mySocket;
@@ -305,7 +306,10 @@ class HumanPlayer extends Player{
 		// write to socket
 		try {
 			output = new DataOutputStream(mySocket.getOutputStream());
-			output.writeUTF(s);
+			if(type == NEED_RESPONSE)
+				output.writeUTF(MAGIC_TOKEN + s); // need magic token if want response
+			else
+				output.writeUTF(s);
 			output.flush();
 		} catch(IOException e) {
 			e.printStackTrace();

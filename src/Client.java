@@ -1,12 +1,15 @@
+package daifugo;
 import java.lang.*;
 import java.util.*;
-import java.util.concurrent.*;
 import java.io.*;
 import java.net.*;
 
 class Client {
 
+	// ----- constants ----- //
+
 	public static final int SERVER_PORT = 5566;
+	private static final String MAGIC_TOKEN = "[m0therfucker]";
 
 	public static void main(String[] argv) {
 		String host = "";
@@ -64,4 +67,5 @@ class Client {
 				consoleInput.close();
 		}
 	}
+
 }
