@@ -8,6 +8,7 @@ public class Daifugo {
 	private static boolean isUnderJackBack;
 	private static boolean isUnderRevolution;
 	private static boolean isTight;
+	private static boolean isNewTrick;
 	private static int nPlayer;
 	private static int nHumanPlayer;
 	private static int nAIPlayer;
@@ -24,7 +25,6 @@ public class Daifugo {
 		Hand currentHand = null;
 		int skipNumber = 0;
 		int effectNumber = 0;
-		msg = new Message(Message.BASIC);
 		// System.err.println("warning: main() not implemented.");
 		// 
 		// get init settings from user's input
@@ -41,20 +41,13 @@ public class Daifugo {
 			isUnderJackBack = false;
 			isUnderRevolution = false;
 			isTight = false;
+			isNewTrick = true;
 
 			System.out.println("=========="+"Round "+(r+1)+"==========");
 			startNewGame(infoCenter, deck, players);
 
-			/*test player get card*/
-			for(int i=0; i<nPlayer; i++) {
-				System.out.println("Player"+i+" : ");
-				ArrayList<Card> hand = infoCenter.getPlayerHand(players.get(i));
-				for(int j=0; j<hand.size(); j++) {
-					System.out.print(hand.get(j)+" ");
-				}
-				System.out.println();
-			}
-			System.out.println(infoCenter.getPlayingNumber());
+			msg = new Message(-1, Message.ACTION_NEW_ROUND, (Object)null, isUnderRevolution, isUnderJackBack, isTight);
+			updateInfo(players);
 
 			while(infoCenter.getPlayingNumber() > 0) {
 				for(int i=0; i<nPlayer; i++) {
@@ -76,13 +69,11 @@ public class Daifugo {
 							//
 							System.out.println("-------"+"Tricks "+(++trick)+"-------");
 							skipNumber = 0;
-							msg.isNewTrick = true;
-							msg.isTight = false;
-							msg.isUnderJackBack = false; 
 							isTight = false;
 							isUnderJackBack = false;
+							isNewTrick = true;
 							currentHand = null;
-							setMessage(infoCenter, players, p, currentHand, Message.BASIC, 0);
+							msg = new Message(i, Message.ACTION_LEADING, (Object)null, isUnderRevolution, isUnderJackBack, isTight);
 							updateInfo(players);
 							effectNumber = getAndCheckHand(infoCenter, players, p, currentHand);
 
@@ -90,8 +81,7 @@ public class Daifugo {
 							// 
 							// can skip or play hand
 							// 
-							msg.isNewTrick = false;
-
+							isNewTrick = false;
 							effectNumber = getAndCheckHand(infoCenter, players, p, currentHand);
 							if(effectNumber == -1) {
 								skipNumber++;
@@ -105,14 +95,12 @@ public class Daifugo {
 							// 
 							System.out.println("-------"+"Tricks "+(++trick)+"-------");
 							skipNumber = 0;
-							msg.isNewTrick = true;
-							msg.isTight = false;
-							msg.isUnderJackBack = false;
 							isTight = false;
 							isUnderJackBack = false;
+							isNewTrick = true;
 							currentHand = null;
 							infoCenter.setPlayerIsLeader(p);
-							setMessage(infoCenter, players, p, currentHand, Message.BASIC, 0);
+							msg = new Message(i, Message.ACTION_LEADING, (Object)null, isUnderRevolution, isUnderJackBack, isTight);
 							updateInfo(players);
 							effectNumber = getAndCheckHand(infoCenter, players, p, currentHand);
 
@@ -123,14 +111,12 @@ public class Daifugo {
 							// 
 							System.out.println("-------"+"Tricks "+(++trick)+"-------");
 							skipNumber = 0;
-							msg.isNewTrick = true;
-							msg.isTight = false;
-							msg.isUnderJackBack = false;
 							isTight = false;
 							isUnderJackBack = false;
+							isNewTrick = true;
 							currentHand = null;
 							infoCenter.setPlayerIsLeader(p);
-							setMessage(infoCenter, players, p, currentHand, Message.BASIC, 0);
+							msg = new Message(i, Message.ACTION_LEADING, (Object)null, isUnderRevolution, isUnderJackBack, isTight);
 							updateInfo(players);
 							effectNumber = getAndCheckHand(infoCenter, players, p, currentHand);
 							infoCenter.setPlayerIsLastPlayer(p);
@@ -138,9 +124,8 @@ public class Daifugo {
 						} else {
 							// 
 							// can skip or play hand
-							// 
-							msg.isNewTrick = false;
-
+							// 	
+							isNewTrick = false;
 							effectNumber = getAndCheckHand(infoCenter, players, p, currentHand);
 							if(effectNumber == -1) {
 								skipNumber++;
@@ -151,35 +136,51 @@ public class Daifugo {
 						}
 
 						if(effectNumber == -7 || effectNumber == -10) {
+
+							msg = new Message(i, Message.ACTION_LOSING, (Object)infoCenter.getPlayerHand(p), isUnderRevolution, isUnderJackBack, isTight);
+
 							int playing = infoCenter.getPlayingNumber() - 1;
 							infoCenter.setPlayerNoHand(p);
 							infoCenter.setPlayerStatus(p, infoCenter.getStatus(playing));
-							setMessage(infoCenter, players, p, currentHand, Message.BASIC, -1);
+
 							updateInfo(players);
+
 						} else if(infoCenter.getPlayerNoHand(p)) {
-							if(infoCenter.getPlayingNumber() == nPlayer) {
+							if(infoCenter.getPlayingNumber() == nPlayer-1) {
+
+								infoCenter.setPlayerStatus(p, infoCenter.getStatus());
+								msg = new Message(i, (short)(Message.ACTION_PLAYING | Message.ACTION_WINNING), (Object)currentHand, isUnderRevolution, isUnderJackBack, isTight);
+								updateInfo(players);
+
 								Player gm = infoCenter.getGrandMillionaire();
 								if(gm != null && gm != p) {
 									// 
 									// gm become EXTREME_NEEDY and no hand
 									// 
+									msg = new Message(players.indexOf(gm), Message.ACTION_LOSING, (Object)infoCenter.getPlayerHand(gm), isUnderRevolution, isUnderJackBack, isTight);
 									infoCenter.setPlayerStatus(gm, InfoCenter.EXTREME_NEEDY);
 									infoCenter.setPlayerNoHand(gm);
+									updateInfo(players);
 								} 
 							}
-							infoCenter.setPlayerStatus(p, infoCenter.getStatus());
-							setMessage(infoCenter, players, p, currentHand, Message.BASIC, -1);
-							updateInfo(players);
 						} else {
-							setMessage(infoCenter, players, p, currentHand, Message.BASIC, effectNumber);
+							if(effectNumber == -1) {
+								msg = new Message(i, Message.ACTION_PASSING, (Object)currentHand, isUnderRevolution, isUnderJackBack, isTight);
+							} else {
+								msg = new Message(i, Message.ACTION_PLAYING, (Object)currentHand, isUnderRevolution, isUnderJackBack, isTight);
+							}
 							updateInfo(players);
+						}
+
+						if(effectNumber == -8) {
+							i -= 1;
 						}
 
 						if(infoCenter.getPlayingNumber() == 1) {
 							Player lastPlayer = infoCenter.getLastPlayer();
+							msg = new Message(players.indexOf(lastPlayer), Message.ACTION_LOSING, (Object)infoCenter.getPlayerHand(lastPlayer), isUnderRevolution, isUnderJackBack, isTight);
 							infoCenter.setPlayerNoHand(lastPlayer);
 							infoCenter.setPlayerStatus(lastPlayer, infoCenter.getStatus());
-							setMessage(infoCenter, players, lastPlayer, currentHand, Message.BASIC, 0);
 							updateInfo(players);
 						}
 					}
@@ -215,14 +216,13 @@ public class Daifugo {
 				}
 			}
 		}
-		if(!msg.isNewTrick) {
+		if(!isNewTrick) {
 			if(lastHand.isTight(newHand)) {
 				isTight = true;
 			}
 		} else {
 			if(newHand.getType() == Hand.STRAIGHT_FLUSH) {
 				isUnderRevolution = !isUnderRevolution;
-				msg.isUnderRevolution = isUnderRevolution;
 			}
 			if(effects.get("SkipFive") > 0) {
 				effectNumber = effects.get("SkipFive");
@@ -231,12 +231,7 @@ public class Daifugo {
 				ArrayList<Card> giveCards = _player.give_up_card(_infoCenter.getPlayerHand(_player), effects.get("GiveSeven"));
 				int give = giveCards.size();
 				if(give != effects.get("GiveSeven")) {
-					int playing = _infoCenter.getPlayingNumber() - 1;
-					_infoCenter.setPlayerNoHand(_player);
-					_infoCenter.setPlayerStatus(_player, _infoCenter.getStatus(playing));
 					effectNumber = -7;
-					setMessage(_infoCenter, _players, _player, newHand, Message.BASIC, effectNumber);
-					updateInfo(_players);
 					return effectNumber;
 				} else {
 					_infoCenter.addPlayerHand(nextPlayer, giveCards);
@@ -246,6 +241,7 @@ public class Daifugo {
 			if(effects.get("EndEight") > 0) {
 				_infoCenter.setPlayerIsLeader(_player);
 				_infoCenter.setPlayerIsLastPlayer(_player);
+				effectNumber = -8;
 			}
 			if(effects.get("AbandonTen") > 0) {
 				ArrayList<Card> giveCards = _player.give_up_card(_infoCenter.getPlayerHand(_player), effects.get("AbandonTen"));
@@ -304,7 +300,6 @@ public class Daifugo {
 		int chance = 5;
 		int effectNumber = -1;
 		Hand playHand;
-		setMessage(_infoCenter, _players, _player, _currentHand, Message.BASIC, 0);
 		if(_currentHand == null) {
 			while(!success) {
 				try {
@@ -312,8 +307,8 @@ public class Daifugo {
 
 					if(playHand.getType() == Hand.UNKNOWN || playHand.getType() == Hand.PASS || !_infoCenter.getPlayerHasThisHand(_player, playHand.getContent())) {
 						success = false;
-						setMessage(_infoCenter, _players, _player, _currentHand, Message.ERROR, 0);
-						_player.update_info(msg);
+						msg = new Message(_players.indexOf(_player), Message.ACTION_WRONG_TYPE, (Object)_currentHand, isUnderRevolution, isUnderJackBack, isTight);
+						updateInfo(_players);
 						System.out.println("Wrong Hand! Try again.");
 					} else {
 						_infoCenter.removePlayerHand(_player, playHand.getContent());
@@ -339,16 +334,16 @@ public class Daifugo {
 					} else if(_currentHand.getType() == Hand.UNKNOWN || !_infoCenter.getPlayerHasThisHand(_player, playHand.getContent())) {
 						success = false;
 						effectNumber = -1;
-						setMessage(_infoCenter, _players, _player, _currentHand, Message.ERROR, 0);
-						_player.update_info(msg);
+						msg = new Message(_players.indexOf(_player), Message.ACTION_WRONG_TYPE, (Object)_currentHand, isUnderRevolution, isUnderJackBack, isTight);
+						updateInfo(_players);
 						System.out.println("Wrong Hand! Try again. You have "+chance+" times to try.");
 					} else if(playHand.getType() == Hand.PASS) {
 						break;
 					} else {
 						success = false;
 						effectNumber = -1;
-						setMessage(_infoCenter, _players, _player, _currentHand, Message.ERROR, 0);
-						_player.update_info(msg);
+						msg = new Message(_players.indexOf(_player), Message.ACTION_CANT_BEAT, (Object)_currentHand, isUnderRevolution, isUnderJackBack, isTight);
+						updateInfo(_players);
 						System.out.println("Can't beat current hand! Try again. You have "+chance+" times to try.");
 					}
 				} catch(Exception e) {
@@ -363,69 +358,6 @@ public class Daifugo {
 		for(int i=0; i<nPlayer; i++) {
 			_players.get(i).update_info(msg);
 		}
-	}
-
-	/**
-	 * to set message to new status
-	 * @param _infoCenter InfoCenter reference
-	 * @param _players ArrayList of Player reference
-	 * @param _player Crrent player reference
-	 * @param _currentHand current hand on table
-	 * @param _type type to be set
-	 */
-	public static void setMessage(InfoCenter _infoCenter, ArrayList<Player> _players, Player _player, Hand _currentHand, byte _type, int _effectNumber) {
-		msg.type = _type;
-		msg.lastPlayer = _players.indexOf(_infoCenter.getLastPlayedPlayer());
-		msg.lastHand = _currentHand;
-
-		if(_effectNumber == 0) {
-			msg.whoseTurn = _players.indexOf(_player);
-		} else if(_effectNumber < 0) {
-			// goes to next player
-			Player nextPlayer = null;
-			int cur = _players.indexOf(_player);
-			while(true) {
-				cur = (cur+1)%nPlayer;
-				if(cur != _players.indexOf(_player)) {
-					nextPlayer = _players.get(cur);
-					if(!_infoCenter.getPlayerNoHand(nextPlayer)) {
-						break;
-					}
-				}
-			}
-			msg.whoseTurn = cur;
-		} else {
-			// skip effectNumber of player
-			Player nextPlayer = null;
-			int cur = _players.indexOf(_player);
-			int skip = _effectNumber;
-			while(true) {
-				cur = (cur+1)%nPlayer;
-				if(cur != _players.indexOf(_player)) {
-					nextPlayer = _players.get(cur);
-					if(skip == 0) {
-						break;
-					}
-					if(!_infoCenter.getPlayerNoHand(nextPlayer)) {
-						skip -= 1;
-					}
-				}
-			}
-			msg.whoseTurn = cur;
-		}
-
-		boolean[] playing = new boolean[nPlayer];
-		for(int i=0; i<nPlayer; i++) {
-			if(_infoCenter.getPlayerIsPlaying(_players.get(i))) {
-				playing[i] = true;
-			} else {
-				playing[i] = false;
-			}
-		}
-		msg.playerStatus = playing;
-		msg.isUnderRevolution = isUnderRevolution;
-		msg.isUnderJackBack = isUnderJackBack;
-		msg.isTight = isTight;
 	}
 
 	/**

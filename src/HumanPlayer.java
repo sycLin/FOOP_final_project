@@ -1,4 +1,4 @@
-package daifugo;
+
 import java.lang.*;
 import java.util.*;
 
@@ -12,13 +12,14 @@ class HumanPlayer extends Player{
 		Scanner scanner = new Scanner(System.in);
 		Collections.sort(myCards);
 		Hand retHand;
-		int jokerNum = 0;
+		
 		while(true) {
 			System.out.println("Your cards:");
 			printCards(myCards);
 			System.out.println("Please enter the cards you want to play.");
 			String input = scanner.nextLine();
 			String[] cardIndices = input.split(" ");
+			int jokerNum = 0;
 			// PASS
 			if(cardIndices.length == 0) {
 				retHand = new Hand(retCards);
@@ -26,13 +27,17 @@ class HumanPlayer extends Player{
 			}
 			try {	
 				for(int i = 0; i < cardIndices.length; i ++) {
-					Card tmp = myCards.get(Integer.parse(cardIndices[i]));
+					Card tmp = myCards.get(Integer.parseInt(cardIndices[i]));
 					retCards.add(tmp);
 					jokerNum += (tmp.getRank() == 0) ? 1 : 0;
 				}
+				for(int i = 0; i < retCards.size(); i ++) {
+					System.out.println(retCards.get(i).toString());
+				}
 			}
 			catch(Exception ex) {
-				System.out.println("Please enter integer within 0 ~ " + myCards.size() - 1);
+				System.out.println("Please enter integer within 0 ~ " + Integer.toString(myCards.size() - 1));
+
 				continue;
 			}
 			if(jokerNum > 0) {
@@ -47,13 +52,14 @@ class HumanPlayer extends Player{
 					}
 					try {
 						for(int i = 0; i < jokerNum; i ++) {
-							jokerAs.add(new Card(cards));
+							jokerAs.add(new Card(cards[i]));
 						}
 					}
 					catch(Exception ex) {
 						System.out.println("Wrong card format, please enter again.");
 						continue;
 					}
+					break;
 				}
 				retHand = new Hand(retCards, jokerAs);
 			}
@@ -63,6 +69,7 @@ class HumanPlayer extends Player{
 			}
 			if(retHand.getType() == Hand.UNKNOWN) {
 				System.out.println("Type unknown");
+				retCards.clear();
 				continue;
 			}
 			break;
@@ -77,8 +84,7 @@ class HumanPlayer extends Player{
 		Scanner scanner = new Scanner(System.in);
 		System.out.println("Please give up " + number + " cards.");
 		Collections.sort(myCards);
-		String input = scanner.nextLine();
-		String[] cardIndices = input.split(" ");
+
 		while(true) {
 			System.out.println("Your cards:");
 			printCards(myCards);
@@ -91,11 +97,11 @@ class HumanPlayer extends Player{
 			}
 			try {	
 				for(int i = 0; i < cardIndices.length; i ++) {
-					retCards.add(myCards.get(Integer.parse(cardIndices[i])));	
+					retCards.add(myCards.get(Integer.parseInt(cardIndices[i])));	
 				}
 			}
 			catch(Exception ex) {
-				System.out.println("Please enter integers within 0 ~ " + myCards.size() - 1);
+				System.out.println("Please enter integers within 0 ~ " + Integer.toString(myCards.size() - 1));
 				continue;
 			}
 			break;
@@ -104,15 +110,15 @@ class HumanPlayer extends Player{
 	}
 	public void update_info(Message msg) {
 		// update_info will also be called when all people pass.
-
+		
 	}
 	public void enter_name() {
 		Scanner scanner = new Scanner(System.in);
 		while(true) {
-			System.out.println("Please enter your name");
-			tmp = scanner.nextLine();
+			System.out.println("Please enter your name:");
+			String tmp = scanner.nextLine();
 			if(tmp.length() > Player.MAX_NAME_LENGTH) {
-				System.out.println("please enter name length smaller than 50.");
+				System.out.println("Please enter name length smaller than 50.");
 				continue;
 			}
 			name = tmp;

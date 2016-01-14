@@ -1,4 +1,4 @@
-package daifugo;
+
 import java.lang.*;
 import java.util.*;
 
@@ -12,7 +12,7 @@ public abstract class Player {
 	 */
 	private int point;
 	private byte title;
-	private String name;
+	protected String name;
 	public static final int MAX_NAME_LENGTH = 50;
 	Player() {
 		point = 0;	
@@ -72,7 +72,7 @@ public abstract class Player {
 
 	// ----- abstract methods ----- //
 
-	public abstract ArrayList<Card> play_card(ArrayList<Card> myCards);
+	public abstract Hand play_card(ArrayList<Card> myCards);
 	/**
 	 *	Give up number cards (7 or 10)
 	 */

@@ -20,14 +20,16 @@ class Message {
 	 * to indicate the action that triggers this message
 	 * (use bit-wise operation to access)
 	 */
+	public static final short ACTION_NOTHING	= (short)0b0000000000000000;
 	public static final short ACTION_PLAYING	= (short)0b0000000000000001;
 	public static final short ACTION_WINNING	= (short)0b0000000000000010;
 	public static final short ACTION_LOSING		= (short)0b0000000000000100;
-	public static final short ACTION_LEADING	= (short)0b0000000000001000;
-	public static final short ACTION_NEW_ROUND	= (short)0b0000000000010000;
-	public static final short ACTION_ROUND_END	= (short)0b0000000000100000;
-	public static final short ACTION_CANT_BEAT	= (short)0b0000000001000000;
-	public static final short ACTION_WRONG_TYPE	= (short)0b0000000010000000;
+	public static final short ACTION_PASSING	= (short)0b0000000000001000;
+	public static final short ACTION_LEADING	= (short)0b0000000000010000;
+	public static final short ACTION_NEW_ROUND	= (short)0b0000000000100000;
+	public static final short ACTION_ROUND_END	= (short)0b0000000001000000;
+	public static final short ACTION_CANT_BEAT	= (short)0b0000000010000000;
+	public static final short ACTION_WRONG_TYPE	= (short)0b0000000100000000;
 
 	/**
 	 * to indicate the occasions of the game
@@ -49,39 +51,22 @@ class Message {
 	private byte type = BASIC;
 
 	/**
-	 * the type of this message: BASIC or ERROR (initially BASIC)
+	 * the position of the player who triggered this message,
+	 * (-1 if system triggered)
+	 */
+	private int playerPosition;
+
+	/**
+	 * the action of the player at player_position did,
+	 * (use bit-wise operations with ACTION_XXX constants)
 	 */
 	private short action;
 
 	/**
-	 * the position of the current playing player
+	 * the content of the cards that triggered by specific effects,
+	 * could be an instance of Hand, or ArrayList of Card.
 	 */
-	private int currentPlayer;
-
-	/**
-	 * the hand of this player 
-	 */
-	private Hand currentHand;
-
-	/**
-	 * the content of the cards that triggered by specific effects
-	 */
-	private ArrayList<Card> content;
-
-	/**
-	 * the position of the last player to play
-	 */
-	private int lastPlayer;
-
-	/**
-	 * the hand of last player 
-	 */
-	private Hand lastHand;
-
-	/**
-	 * the position of the next player to play
-	 */
-	private int nextPlayer;
+	private Object content;
 
 	/**
 	 * whether it's under revolution
@@ -101,22 +86,32 @@ class Message {
 	// ----- actions ----- //
 
 	/**
-	 * to construct a message containing basic information
+	 * to construct a dummy message
 	 */
-	public Message(short act, int cPlayer, Hand cHand, int lPlayer, Hand lHand, ArrayList<Card> cont, int nPlayer, boolean isR, boolean isJ, boolean isT) {
-		action = act;
-		currentPlayer = cPlayer;
-		if (cHand != null)
-			currentHand = new Hand(cHand.getContent());
-		else 
-			currentHand = new Hand(new ArrayList<Card>());
-		lastPlayer = lPlayer;
-		if (lHand != null)
-			lastHand = new Hand(lHand.getContent());
-		else
-			lastHand = new Hand(new ArrayList<Card>());
-		content = cont;
-		nextPlayer = nPlayer;
+	public Message() {
+		type = BASIC;
+		playerPosition = -1;
+		action = ACTION_NOTHING;
+		content = null;
+		isUnderRevolution = false;
+		isUnderJackBack = false;
+		isTight = false;
+	}
+
+	/**
+	 * to construct a message containing basic information
+	 * @param pPosition the player position
+	 * @param theAction the action took by the player
+	 * @param theContent the content of the action
+	 * @param isR whether under revolution or not
+	 * @param isJ whether under Jack back or not
+	 * @param isT whether being tight or not
+	 */
+	public Message(int pPosition, short theAction, Object theContent, boolean isR, boolean isJ, boolean isT) {
+		type = BASIC; // default message type: BASIC
+		playerPosition = pPosition;
+		action = theAction;
+		content = theContent;
 		isUnderRevolution = isR;
 		isUnderJackBack = isJ;
 		isTight = isT;
@@ -124,11 +119,22 @@ class Message {
 
 	/**
 	 * to construct a message to inform player of his/her erroneus move
-	 * @param errMsg the error message
+	 * @param msgType the type of this message
+	 * @param pPosition the player position
+	 * @param theAction the action took by the player
+	 * @param theContent the content of the action
+	 * @param isR whether under revolution or not
+	 * @param isJ whether under Jack back or not
+	 * @param isT whether being tight or not
 	 */
-	public Message(byte errMsg, short act, int cPlayer, Hand cHand, int lPlayer, Hand lHand, ArrayList<Card> cont, int nPlayer, boolean isR, boolean isJ, boolean isT) {
-		this(act, cPlayer, cHand, lPlayer, lHand, cont, nPlayer, isR, isJ, isT);
-		this.type = errMsg;
+	public Message(byte msgType, int pPosition, short theAction, Object theContent, boolean isR, boolean isJ, boolean isT) {
+		type = msgType;
+		playerPosition = pPosition;
+		action = theAction;
+		content = theContent;
+		isUnderRevolution = isR;
+		isUnderJackBack = isJ;
+		isTight = isT;
 	}
 
 	public short getAction() {
@@ -141,35 +147,18 @@ class Message {
 		return ret;
 	}
 
-	public int getCurrentPlayer() {
-		int ret = currentPlayer;
+	public int getPlayer() {
+		int ret = playerPosition;
 		return ret;
 	}
 
-	public Hand getCurrentHand() {
-		ArrayList<Card> cont = currentHand.getContent();
-		ArrayList<Card> joker = currentHand.getJokerContent();
-		return new Hand(cont, joker);
-	}
-
-	public ArrayList<Card> getContent() {
-		ArrayList<Card> ret = content;
+	public short getAction() {
+		short ret = action;
 		return ret;
 	}
 
-	public int getLastPlayer() {
-		int ret = lastPlayer;
-		return ret;
-	}
-
-	public Hand getLastHand() {
-		ArrayList<Card> cont = lastHand.getContent();
-		ArrayList<Card> joker = lastHand.getJokerContent();
-		return new Hand(cont, joker);
-	}
-
-	public int getNextPlayer() {
-		int ret = nextPlayer;
+	public Object getContent() {
+		Object ret = content;
 		return ret;
 	}
 
@@ -190,18 +179,20 @@ class Message {
 
 	public String toString() {
 		String ret = "";
-		String[] typeList = {"", "BASIC", "ERROR"};
-		ret += ("TYPE: " + typeList[(int)type] + '\n');
-		ret += ("action: " + action + '\n');
-		ret += ("current Player: " + currentPlayer + '\n');
-		ret += ("current Hand: " + currentHand + '\n');
-		ret += ("content: " + content + '\n');
-		ret += ("last Player: " + lastPlayer + '\n');
-		ret += ("last Hand: " + lastHand + '\n');
-		ret += ("next Player: " + nextPlayer + '\n');
-		ret += ("revolution: " + isUnderRevolution + '\n');
-		ret += ("jackback: " + isUnderJackBack + '\n');
-		ret += ("tight: " + isTight + '\n');
+		
+		/* should be modified accordingly, so I commented out the below */
+
+		// String[] typeList = {"", "BASIC", "ERROR"};
+		// ret += ("TYPE: " + typeList[(int)type] + '\n');
+		// ret += ("current Player: " + currentPlayer + '\n');
+		// ret += ("current Hand: " + currentHand + '\n');
+		// ret += ("content: " + content + '\n');
+		// ret += ("last Player: " + lastPlayer + '\n');
+		// ret += ("last Hand: " + lastHand + '\n');
+		// ret += ("next Player: " + nextPlayer + '\n');
+		// ret += ("revolution: " + isUnderRevolution + '\n');
+		// ret += ("jackback: " + isUnderJackBack + '\n');
+		// ret += ("tight: " + isTight + '\n');
 		return ret;
 	}
 }
