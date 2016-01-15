@@ -25,7 +25,7 @@ class Client {
 			try {
 				input = new DataInputStream(socket.getInputStream());
 				output = new DataOutputStream(socket.getOutputStream());
-				while(input.available()>0) {
+				while(true) {
 					try {
 						String tmp_string = input.readUTF();
 						if(tmp_string.startsWith(MAGIC_TOKEN)) { // need response
