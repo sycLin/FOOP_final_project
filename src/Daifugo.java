@@ -527,6 +527,7 @@ public class Daifugo {
 
 		for(int i=0; i<nPlayer; i++) {
 			players.get(i).enter_name();
+			// System.out.println("got the name: " + players.get(i).get_name());
 			players.get(i).set_title(InfoCenter.COMMONER);
 		}
 	}

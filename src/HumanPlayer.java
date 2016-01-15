@@ -343,11 +343,13 @@ class HumanPlayer extends Player{
 	 * @return a string of response, will return an empty string if DONT_NEED_RESPONSE
 	 */
 	private String output_wrapper(int type, String s) {
+		// System.out.println("inside output_wrapper() function");
 		String ret = "";
 		DataInputStream input = null;
 		DataOutputStream output = null;
 		// write to socket
 		try {
+			// System.out.println("writing to socket...");
 			output = new DataOutputStream(mySocket.getOutputStream());
 			if(type == NEED_RESPONSE)
 				output.writeUTF(MAGIC_TOKEN + s); // need magic token if want response
@@ -356,29 +358,27 @@ class HumanPlayer extends Player{
 			output.flush();
 		} catch(IOException e) {
 			e.printStackTrace();
-		} finally {
-			// close the output stream
-			try {
-				output.close();
-			} catch(Exception e) {
-				e.printStackTrace();
-			}
 		}
 		// get response
 		if(type == NEED_RESPONSE) {
+			// System.out.println("(needing response)");
 			try {
 				input = new DataInputStream(mySocket.getInputStream());
-				ret = input.readUTF();
+				do {
+					try {
+						ret = input.readUTF();
+						// System.out.println("read this: " + ret + ", with length = " + ret.length());
+					} catch(Exception e) {
+						// System.out.println("caught an error when reading DataInputStream...");
+						continue;
+					}
+				} while(ret == null || ret.length() <= 1);
 			} catch(IOException e) {
+				// System.out.println("caught an error when getInputStream()...");
 				e.printStackTrace();
-			} finally {
-				try {
-					input.close();
-				} catch(Exception e) {
-					e.printStackTrace();
-				}
 			}
 		}
+		// System.out.println("output_wrapper() about to return this: " + ret);
 		return ret;
 	}
 

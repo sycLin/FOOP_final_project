@@ -30,7 +30,12 @@ class Client {
 						String tmp_string = input.readUTF();
 						if(tmp_string.startsWith(MAGIC_TOKEN)) { // need response
 							System.out.println(tmp_string.substring(MAGIC_TOKEN.length()));
-							output.writeUTF(consoleInput.nextLine());
+							String tmp = "";
+							while(true) {
+								tmp = consoleInput.nextLine();
+								if(tmp.length() > 1) break;
+							}
+							output.writeUTF(tmp);
 							output.flush();
 						} else { // dont need response
 							System.out.println(tmp_string);
