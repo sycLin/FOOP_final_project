@@ -33,7 +33,7 @@ class Client {
 							String tmp = "";
 							while(true) {
 								tmp = consoleInput.nextLine();
-								if(tmp.length() > 1) break;
+								if(tmp.length() >= 0) break;
 							}
 							output.writeUTF(tmp);
 							output.flush();

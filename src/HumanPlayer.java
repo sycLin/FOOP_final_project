@@ -372,7 +372,7 @@ class HumanPlayer extends Player{
 						// System.out.println("caught an error when reading DataInputStream...");
 						continue;
 					}
-				} while(ret == null || ret.length() <= 1);
+				} while(ret == null || ret.length() <= 0);
 			} catch(IOException e) {
 				// System.out.println("caught an error when getInputStream()...");
 				e.printStackTrace();
