@@ -3,196 +3,442 @@ import java.lang.*;
 import java.util.*;
 
 class AIPlayer extends Player{
+
+	private Hand lastHand;
+	private boolean lead;
+	private boolean isReversed;
+	private boolean isTight;
+	private int myPosition;
+	private boolean forcedExch;
+
 	public AIPlayer() {
 		super();
+		lead = false;
+		isReversed = false;
+		forcedExch = false;
 	}
+
+	private ArrayList<Hand> find_all_hands(ArrayList<Card> myCards) {
+		ArrayList<Hand> allHands = new ArrayList<Hand>();
+		ArrayList<Card> tmpCards = new ArrayList<Card>();
+		ArrayList<Card> jokerAs = new ArrayList<Card>();
+
+		Collections.sort(myCards);
+		for(int i = 0; i < myCards.size(); i ++) {
+
+			if(i < myCards.size() - 3) {
+				// [FOUR_OF_A_KIND] without JOKER
+				if(myCards.get(i).getRank() == myCards.get(i + 1).getRank() &&
+				   myCards.get(i + 1).getRank() == myCards.get(i + 2).getRank() &&
+				   myCards.get(i + 2).getRank() == myCards.get(i + 3).getRank()) {
+					tmpCards.clear();
+					for(int j = 0; j < 4; j ++) {
+						tmpCards.add(myCards.get(i + j));
+					}
+					allHands.add(new Hand(tmpCards));
+				}
+			} 
+			if(i < myCards.size() - 2) {
+				
+				if(myCards.get(i).getRank() == myCards.get(i + 1).getRank() &&
+				   myCards.get(i + 1).getRank() == myCards.get(i + 2).getRank()) {
+					// [THREE_OF_A_KIND] without JOKER
+					tmpCards.clear();
+					for(int j = 0; j < 3; j ++) {
+						tmpCards.add(myCards.get(i + j));
+					}
+					allHands.add(new Hand(tmpCards));
+
+					// Then add THREE_OF_A_KIND plus Joker, (if there is any)
+					// as another form of FOUR_OF_A_KIND to all hands
+					if(myCards.get(myCards.size() - 1).getSuit() == Card.JOKER) {
+						jokerAs.clear();
+						tmpCards.add(myCards.get(myCards.size() - 1));
+						jokerAs.add(myCards.get(i));
+						allHands.add(new Hand(tmpCards, jokerAs));
+					}
+				}
+
+				// [THREE_OF_A_KIND] with two JOKERs
+				if(myCards.get(myCards.size() - 1).getSuit() == Card.JOKER &&
+				   myCards.get(myCards.size() - 2).getSuit() == Card.JOKER &&
+				   myCards.get(i).getSuit() != Card.JOKER) {
+					tmpCards.clear();
+					tmpCards.add(myCards.get(i));
+					tmpCards.add(myCards.get(myCards.size() - 1));
+					tmpCards.add(myCards.get(myCards.size() - 2));
+
+					jokerAs.clear();
+					jokerAs.add(myCards.get(i));
+					jokerAs.add(myCards.get(i));
+					allHands.add(new Hand(tmpCards, jokerAs));
+				}
+			}
+			if(i < myCards.size() - 1) {
+				// PAIR
+				if(myCards.get(i).getRank() == myCards.get(i + 1).getRank()) {
+					// First add [PAIR] to all hands
+					tmpCards.clear();
+					for(int j = 0; j < 2; j ++) {
+						tmpCards.add(myCards.get(i + j));
+					}
+					allHands.add(new Hand(tmpCards));
+					// Then add PAIR plus JOKER as [THREE_OF_A_KIND]
+					if(myCards.get(i).getSuit() != Card.JOKER && 
+					   myCards.get(myCards.size() - 1).getSuit() == Card.JOKER) {
+						jokerAs.clear();
+						jokerAs.add(myCards.get(i));
+						tmpCards.add(myCards.get(myCards.size() - 1));
+						allHands.add(new Hand(tmpCards, jokerAs));
+					}
+					// [PAIR] plus two JOKERs as [FOUR_OF_A_KIND]
+					if(myCards.get(i).getSuit() != Card.JOKER &&
+					   myCards.get(myCards.size() - 1).getSuit() == Card.JOKER &&
+					   myCards.get(myCards.size() - 2).getSuit() == Card.JOKER) {
+						tmpCards.add(myCards.get(myCards.size() - 1));
+						tmpCards.add(myCards.get(myCards.size() - 2));
+						jokerAs.clear();
+						jokerAs.add(myCards.get(i));
+						jokerAs.add(myCards.get(i));
+						allHands.add(new Hand(tmpCards, jokerAs));
+					}
+					// Two JOKERs as [PAIR]
+					if(myCards.get(i).getSuit() == Card.JOKER) {
+						jokerAs.clear();
+						tmpCards.clear();
+						tmpCards.add(myCards.get(i));
+						tmpCards.add(myCards.get(i + 1));
+						for(int j = 1; j <= 13; j ++) {
+							jokerAs.add(new Card(Card.HEART, (byte)j));
+							jokerAs.add(new Card(Card.SPADE, (byte)j));
+							allHands.add(new Hand(tmpCards, jokerAs));
+						}
+					}
+
+				}
+			}
+			
+			// [SINGLE] without JOKER
+			if(myCards.get(i).getSuit() != Card.JOKER) {
+				tmpCards.clear();
+				tmpCards.add(myCards.get(i));
+				allHands.add(new Hand(tmpCards));
+			}
+
+			// JOKER as [SINGLE]
+			else {
+				
+				for(int j = 1; j <= 13; j ++) {
+					tmpCards.clear();
+					tmpCards.add(myCards.get(i));
+					jokerAs.clear();
+					jokerAs.add(new Card(Card.CLUB, (byte)j));
+					allHands.add(new Hand(tmpCards, jokerAs));
+				}
+			}
+
+			// [PAIR] with one JOKER
+			if(myCards.get(myCards.size() - 1).getSuit() == Card.JOKER &&
+			   myCards.get(i).getSuit() != Card.JOKER) {
+				tmpCards.clear();
+				tmpCards.add(myCards.get(i));
+				tmpCards.add(myCards.get(myCards.size() - 1));
+
+				jokerAs.clear();
+				jokerAs.add(myCards.get(i));
+				allHands.add(new Hand(tmpCards, jokerAs));
+			}
+		}
+
+		// ArrayList<Card> tmpJokers = new ArrayList<Card>();
+		// // Remove JOKERS from myCards first
+		// // In the implementation, it doesn't need to go back.
+		// for(int i = 0; i < 2; i ++) {
+		// 	if(myCards.get(myCards.size() - 1).getSuit() == Card.JOKER) {
+		// 		tmpJokers.add(myCards.get(myCard.size() - 1));
+		// 		myCards.remove(myCards.size() - 1);
+		// 	}
+		// }
+		// // Move ACEs and TWOs to the last.
+		// for(int i = 0; i < myCards.size(); i ++) {
+		// 	if(myCards.get(0).getRank() <= 2) {
+		// 		myCards.add(myCards.get(i));
+		// 		myCards.remove(0);
+		// 	}
+		// 	else {
+		// 		break;
+		// 	}
+		// }
+
+		// // Create four ArrayList<Card> representing four Suit.
+		// ArrayList<Card> clubs = new ArrayList<Card>();
+		// ArrayList<Card> diamonds = new ArrayList<Card>();
+		// ArrayList<Card> hearts = new ArrayList<Card>();
+		// ArrayList<Card> spades = new ArrayList<Card>();
+
+		// // And separate myCards into four suits.
+		// for(int i = 0; i < myCards.size(); i ++) {
+		// 	switch(myCards.get(i).getSuit()) {
+		// 		case Card.CLUB:
+		// 			clubs.add(myCards.get(i));
+		// 			break;
+		// 		case Card.DIAMOND:
+		// 			diamonds.add(myCards.get(i));
+		// 			break;
+		// 		case Card.HEART:
+		// 			hearts.add(myCards.get(i));
+		// 			break;
+		// 		case Card.SPADE:
+		// 			spade.add(myCards.get(i));
+		// 			break;
+		// 	}
+		// }
+		// ArrayList<ArrayList<Card>> all = new ArrayList<ArrayList<Card>>();
+		// all.add(clubs);
+		// all.add(diamonds);
+		// all.add(hearts);
+		// all.add(spades);
+
+
+		// Hand tmpHand;
+		// for(int i = 0; i < 4; i ++) {
+		// 	ArrayList<Card> sameSuits = all.get(i);
+		// 	for(int j = 0; j < sameSuits.size() - 3; j ++) {
+		// 		// [STRAIGHT_FLUSH] Detection
+		// 		// Case 1: WITHOUT JOKERS
+		// 		tmpCards.clear();
+		// 		for(int k = 0; k < 4; k ++) {
+		// 			tmpCards.add(sameSuits.get(j + k));
+		// 		}
+		// 		tmpHand = new Hand(tmpCards);
+		// 		if(tmpHand.isStraightFlush()) {
+		// 			allHands.add(tmpHand);
+		// 		}
+
+		// 		// Case 2: WITH one JOKER
+		// 		if(tmpJokers.size() == 1) {
+		// 			// Case 2.1: [JOKER][1][2][3]
+		// 			tmpCards.clear();
+		// 			if(sameSuits.get(j).getRealRank() > 3) {
+		// 				tmpCards.add(new Card(sameSuits.get(j).getSuit(), sameSuits.get(j).getRealRank() - 1));
+		// 				for(int k = 0; k < 3; k ++) {
+		// 					tmpCards.add(sameSuits.get(j + k));
+		// 				}
+		// 			}
+		// 			tmpHand = new Hand(tmpCards);
+		// 			if(tmpHand.isStraightFlush()) {
+		// 				jokerAs.clear();
+		// 				jokerAs.add(tmpCards.get(0));
+		// 				allHands.add(tmpHand);
+		// 			}
+		// 			// Case 2.2: [1][JOKER][2][3]
+		// 			tmpCards.clear();
+		// 			tmpCards.add(new Card(sameSuits.get(j).getSuit(), sameSuits.get(j).getRealRank() + 1));
+		// 			for(int k = 0; k < 3; k ++) {
+		// 				tmpCards.add(sameSuits.get(j + k));
+		// 			}
+		// 			tmpHand = new Hand(tmpCards);
+		// 			if(tmpHand.isStraightFlush()) {
+		// 				allHands.add(tmpHand);
+		// 			}
+		// 			// Case 2.2: [1][2][JOKER][3]
+		// 			tmpCards.clear();
+		// 			tmpCards.add(new Card(sameSuits.get(j).getSuit(), sameSuits.get(j).getRealRank() + 1));
+		// 			// Case 2.2: [1][2][3][JOKER]
+		// 		}
+				
+
+				
+
+		// }
+		
+
+		
+
+		return allHands;
+	}
+
 	public Hand play_card(ArrayList<Card> myCards) {
 		ArrayList<Card> retCards = new ArrayList<Card>();
 		ArrayList<Card> jokerAs = new ArrayList<Card>();
-		Scanner scanner = new Scanner(System.in);
+		if(myCards.size() <= 1) {
+			retCards.add(myCards.get(0));
+			return new Hand(retCards);
+		}
 		Collections.sort(myCards);
 		Hand retHand;
-		
-		while(true) {
-			System.out.println("Your cards:");
-			printCards(myCards);
-			System.out.println("Please enter the cards you want to play.");
-			String input = scanner.nextLine();
-			String[] cardIndices = input.split(" ");
-			int jokerNum = 0;
-			// PASS
-			if(cardIndices.length == 0) {
-				retHand = new Hand(retCards);
-				break;
-			}
-			try {	
-				for(int i = 0; i < cardIndices.length; i ++) {
-					Card tmp = myCards.get(Integer.parseInt(cardIndices[i]));
-					retCards.add(tmp);
-					jokerNum += (tmp.getRank() == 0) ? 1 : 0;
-				}
-				for(int i = 0; i < retCards.size(); i ++) {
-					System.out.println(retCards.get(i).toString());
-				}
-			}
-			catch(Exception ex) {
-				System.out.println("Please enter integer within 0 ~ " + Integer.toString(myCards.size() - 1));
+		byte type;
+		System.out.println("FINDING ALL HANDS");
+		ArrayList<Hand> allHands = find_all_hands(myCards);
 
-				continue;
+
+		// DEBUGGING MODE
+		System.out.print(myPosition + ":");
+		print_cards(myCards);
+		// for(int i = 0; i < allHands.size(); i ++) {
+		// 	System.out.println(allHands.get(i).toString());
+		// }
+
+		if(lead) {
+			lead = !lead;
+			int rand = (int)(Math.random() * allHands.size());
+			System.out.println(allHands.get(rand).toString());
+			return allHands.get(rand);
+		}
+
+		for(int i = 0; i < allHands.size(); i ++) {
+			if(Daifugo.canBeat(allHands.get(i).beats(lastHand), lastHand, allHands.get(i))) {
+				System.out.println(allHands.get(i).toString());
+				System.out.println(" can beat ");
+				System.out.println(lastHand.toString());
+				return allHands.get(i);
 			}
-			if(jokerNum > 0) {
-				while(true) {
-					System.out.println("You have " + jokerNum + " jokers.");
-					System.out.println("What do you want your jokers be?");
-					input = scanner.nextLine();
-					String[] cards = input.split(" ");
-					if(cards.length != jokerNum) {
-						System.out.println("Number not matched. Please enter again.");
-						continue;
+		}
+
+		// DEBUGGING MODE
+		// Scanner scanner = new Scanner(System.in);
+		// String x = scanner.nextLine();
+		System.out.println("PASS");
+		return new Hand(retCards);
+	}
+
+	private int[] generate_random(int rng, int number) {
+		int[] ret = new int[number];
+		boolean flag;
+		for(int i = 0; i < number; i ++) {
+			
+			while(true) {
+				flag = true;
+				ret[i] = (int)Math.random() * rng;
+				for(int j = 0; j < i; j ++) {
+					if(ret[i] == ret[j]) {
+						flag = false;
 					}
-					try {
-						for(int i = 0; i < jokerNum; i ++) {
-							jokerAs.add(new Card(cards[i]));
-						}
-					}
-					catch(Exception ex) {
-						System.out.println("Wrong card format, please enter again.");
-						continue;
-					}
+				}
+				if(flag) {
 					break;
 				}
-				retHand = new Hand(retCards, jokerAs);
 			}
-			// There is no Joker.
-			else {
-				retHand = new Hand(retCards);	
-			}
-			if(retHand.getType() == Hand.UNKNOWN) {
-				System.out.println("Type unknown");
-				retCards.clear();
-				continue;
-			}
-			break;
 		}
-		return retHand;
+		return ret;
 	}
+
 	public ArrayList<Card> give_up_card(ArrayList<Card> myCards, int number) {
+		ArrayList<Card> retCards = new ArrayList<Card>();
+		ArrayList<Card> arragedMyCards = rearrange(myCards);
+		if(forcedExch) {
+			forcedExch = false;
+			// GIVE UP BIGGEST cards
+			for(int i = 0; i < number; i ++) {
+				retCards.add(arragedMyCards.get(myCards.size() - i - 1));
+			}
+			System.out.println("I've paid what I needed to pay.");
+			return retCards;
+		}
+
 		if(myCards.size() <= number) {
 			return myCards;
 		}
-		ArrayList<Card> retCards = new ArrayList<Card>();
-		Scanner scanner = new Scanner(System.in);
-		System.out.println("Please give up " + number + " cards.");
-		Collections.sort(myCards);
 
-		while(true) {
-			System.out.println("Your cards:");
-			printCards(myCards);
-			System.out.println("Please enter the cards you want to give up.");
-			String input = scanner.nextLine();
-			String[] cardIndices = input.split(" ");
-			if(cardIndices.length != number) {
-				System.out.println("Please enter " + number + " cards.");
-				continue;
-			}
-			try {	
-				for(int i = 0; i < cardIndices.length; i ++) {
-					retCards.add(myCards.get(Integer.parseInt(cardIndices[i])));	
-				}
-			}
-			catch(Exception ex) {
-				System.out.println("Please enter integers within 0 ~ " + Integer.toString(myCards.size() - 1));
-				continue;
-			}
-			break;
+		// GIVE UP SMALLEST cards
+		System.out.println("GIVE UP CARD");
+		//int[] randNums = generate_random(myCards.size(), number);
+		for(int i = 0; i < number; i ++) {
+			retCards.add(arragedMyCards.get(i));
 		}
 		return retCards;
 	}
-	public void update_info(Message msg) {
-		if(msg.getType() == Message.ERROR) {
-			Hand lastHand = (Hand)msg.getContent();
-			if((msg.getAction() & Message.ACTION_CANT_BEAT) != 0) {
-				System.out.println("Your hand couldn't beat the last hand, please play your cards again.");
-			}
-			else if((msg.getAction() & Message.ACTION_WRONG_TYPE) != 0) {
-				System.out.println("You played wrong type of hand, please play your cards again.");
-			}
-			System.out.println("The last hand was " + lastHand.toString());
-		}
-		else if(msg.getType() == Message.BASIC) {
-			// The KING lost
-			if((msg.getAction() & Message.ACTION_LOSING) != 0) {
-				ArrayList<Card> kingCards = (ArrayList<Card>)msg.getContent();
-				System.out.println("The KING lost, here are his remains.");
-				printCards(kingCards);
-			}
-			// A person played his cards.
-			else if((msg.getAction() & Message.ACTION_PLAYING) != 0) {
-				Hand lastHand = (Hand)msg.getContent();
-				System.out.println("Player" + Integer.toString(msg.getPlayer()) + "'s hand was " + lastHand.toString());
-				// Someone won.
-				if((msg.getAction() & Message.ACTION_WINNING) != 0) {
-					System.out.println("Player at position " + msg.getPlayer() + "won.");	
-				}
-			}
 
-			else if((msg.getAction() & Message.ACTION_NEW_ROUND) != 0) {
-				System.out.println("-----------");
-				System.out.println("| Round " + Integer.toString((int)msg.getContent()) + " |");
-				System.out.println("-----------");
+	private ArrayList<Card> rearrange(ArrayList<Card> myCards) {
+		ArrayList<Card> retCards = new ArrayList<Card>();
+		Collections.sort(myCards);
+		for(int i = 0; i < myCards.size(); i ++) {
+			if(myCards.get(i).getRank() > 2 && myCards.get(i).getSuit() != Card.JOKER) {
+				retCards.add(myCards.get(i));
 			}
+		}
+		for(int i = 0; i < myCards.size(); i ++) {
+			if(myCards.get(i).getRank() <= 2 || myCards.get(i).getSuit() == Card.JOKER) {
+				retCards.add(myCards.get(i));
+			}	
+		}
+		// for(int i = 0; i < myCards.size(); i ++) {
+		// 	System.out.print(myCards.get(i).toString());
+		// }
+		// System.out.print("\n");
+		// for(int i = 0; i < myCards.size(); i ++) {
+		// 	System.out.print(retCards.get(i).toString());
+		// }
+		// Scanner scanner = new Scanner(System.in);
+		// String x = scanner.nextLine();
+		return retCards;
+	}
+
+	private void print_cards(ArrayList<Card> myCards) {
+		String tmpLine = "";
+		for(int i = 0; i < myCards.size(); i ++) {
+			tmpLine += myCards.get(i).toString();
+		}
+		System.out.println(tmpLine);
+	}
+
+	public void update_info(Message msg) {
+		// A person played his cards.
+		if((msg.getAction() & Message.ACTION_PLAYING) != 0) {
+			lastHand = (Hand)msg.getContent();
+			isReversed = msg.isUnderRevolution() ^ msg.isUnderJackBack();
 			
-			else if((msg.getAction() & Message.ACTION_PASSING) != 0) {
-				Hand lastHand = (Hand)msg.getContent();
-				System.out.println("Player" + Integer.toString(msg.getPlayer()) + " passed");
-				System.out.println("The last hand was " + lastHand.toString());
+			isTight = msg.isTight();
+			// System.out.println("Player" + Integer.toString(msg.getPlayer()) + "'s hand was " + lastHand.toString());
+			// Someone won.
+			if((msg.getAction() & Message.ACTION_WINNING) != 0) {
+				System.out.println("Player at position " + msg.getPlayer() + "won.");	
 			}
-			else if((msg.getAction() & Message.ACTION_LEADING) != 0) {
-				System.out.println("----- Trick " + Integer.toString((int)msg.getContent()) + " -----");
-				System.out.println("The leader of this trick is position " + Integer.toString(msg.getPlayer()));
+		}
+
+		// DONE
+		else if((msg.getAction() & Message.ACTION_LEADING) != 0) {
+			//System.out.println("----- Trick " + Integer.toString((int)msg.getContent()) + " -----");
+			//System.out.println("The leader of this trick is position " + Integer.toString(msg.getPlayer()));
+			if(myPosition == msg.getPlayer()) {
+				lead = true;
 			}
-			else if((msg.getAction() & Message.ACTION_EXCH_CARD) != 0) {
-				switch(this.get_title()) {
-					case InfoCenter.GRAND_MILLIONAIRE:
-						System.out.println("You are the GRAND MILLIONAIRE, now it's your turn to give up two cards.");
-						break;
-					case InfoCenter.MILLIONAIRE:
-						System.out.println("You are the MILLIONAIRE, now it's your turn to give up one cards.");	
-						break;
-					case InfoCenter.NEEDY:
-						System.out.println("You are the NEEDY, now it's your turn to give up one cards.");		
-						break;
-					case InfoCenter.EXTREME_NEEDY:
-						System.out.println("You are the EXTREME NEEDY, now it's your turn to give up two cards.");
-						break;
-				}
+		}
+
+		// DONE
+		else if((msg.getAction() & Message.ACTION_EXCH_CARD) != 0) {
+			if(this.get_title() == InfoCenter.NEEDY || this.get_title() == InfoCenter.EXTREME_NEEDY) {
+				forcedExch = true;
+				System.out.println("HAHAHA");
+			}
+			else {
+				System.out.println("HEYHEY");
+			}
+		}
+
+		else if((msg.getAction() & Message.ACTION_UPDT_POS) != 0) {
+			myPosition = msg.getPlayer();
+			String[] tmpNames = (String[])msg.getContent();
+			
+			// for(int i = 0; i < 4; i ++) {
+				
+			// 	names[i] = tmpNames[i];	
+			// 	output_wrapper(DONT_NEED_RESPONSE, "Player at position " + i + ": " + names[i]);
+			// 	output_wrapper(DONT_NEED_RESPONSE, "Your position: " + myPosition);
+			// }
+			
+		}
+		else if((msg.getAction() & Message.ACTION_UPDT_SCORE) != 0) {
+			int[] scores = (int[])msg.getContent();
+			System.out.println("------ SCORES ------");
+			for(int i = 0; i < 4; i ++) {
+				System.out.println(i + ": " + scores[i]);
 			}
 		}
 	}
 	public void enter_name() {
-		Scanner scanner = new Scanner(System.in);
-		while(true) {
-			System.out.println("Please enter your name:");
-			String tmp = scanner.nextLine();
-			if(tmp.length() > Player.MAX_NAME_LENGTH) {
-				System.out.println("Please enter name length smaller than 50.");
-				continue;
-			}
-			name = tmp;
-			break;
-		}
-	}
-	private void printCards(ArrayList<Card> myCards) {
-		for(int i = 0; i < myCards.size(); i ++) {
-			System.out.print("(" + i + ")" + myCards.get(i).toString());
-		}
-		System.out.println("");
+		name = "9527";
 	}
 }
 
 
-/**
- *	TODO LIST:
- *	1. When pass, any string includes "PASS", or "-1"
- *	2. fix the bugs of two space for split.
- */
