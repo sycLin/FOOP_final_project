@@ -352,8 +352,14 @@ class Hand {
 		}
 		ret += "]\n";
 		// then print the content of the hand
-		for (int i = 0; i < contentWithJoker.size(); i++) {
-			ret += (contentWithJoker.get(i) + " ");
+		for (int i = 0; i < content.size(); i++) {
+			ret += (content.get(i) + " ");
+		}
+		if(hasJoker()) {
+			ret += "as ";
+			for(int j = 0; j < contentWithJoker.size(); j ++) {
+				ret += (contentWithJoker.get(j) + " ");
+			}
 		}
 		return ret;
 	}
