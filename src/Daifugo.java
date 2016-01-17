@@ -520,7 +520,7 @@ public class Daifugo {
 		}
 		for(int i=0; i<nAIPlayer; i++) {
 			// players.add(new AIPlayer());
-			players.add(new HumanPlayer());
+			players.add(new AIPlayer());
 		}
 
 		createConnection(players);
