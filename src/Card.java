@@ -86,6 +86,16 @@ final class Card implements Comparable<Card> {
 	}
 
 	/**
+	 * to get the REAL rank of the card
+	 * @return the rank of the card
+	 * For example: A is 14
+	 */
+	public byte getRealRank() {
+		byte ret = rank;
+		return ret <= (byte)2 ? (byte)(ret + 13) : (byte)ret;
+	}
+
+	/**
 	 * to check if rank is bigger (more powerful)
 	 * @param another_card the card to compare with
 	 * @return true if bigger, false if equal or smaller.
