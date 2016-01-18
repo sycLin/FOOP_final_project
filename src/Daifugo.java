@@ -65,10 +65,13 @@ public class Daifugo {
 				System.err.print(players.get(i).get_name()+" "+infoCenter.getPlayerStatus(players.get(i)));
 			}
 			System.err.println();
-
+			boolean nextFlag = false;
 			while(infoCenter.getPlayingNumber() > 0) {
 				for(int i=0; i<nPlayer; i++) {
 					Player p = players.get(i);
+					if(infoCenter.getPlayerNoHand(p) && infoCenter.getPlayerIsLastPlayer(p)) {
+						nextFlag = true;
+					}
 					if(!infoCenter.getPlayerNoHand(p)) {
 						int playing = infoCenter.getPlayingNumber();
 						if(effectNumber > 0) {
@@ -131,10 +134,11 @@ public class Daifugo {
 							effectNumber = getAndCheckHand(infoCenter, players, p);
 
 						} else if(!infoCenter.getPlayerIsLeader(p) && !infoCenter.getPlayerIsLastPlayer(p) &&
-									infoCenter.getPlayingNumber() == skipNumber) {
+									nextFlag) {
 							// 
 							// become leader and the last player, can't skip, do anythings you want
 							// 
+							nextFlag = false;
 							System.err.println("-------"+"Tricks "+(++trick)+"-------");
 							skipNumber = 0;
 							isTight = false;
