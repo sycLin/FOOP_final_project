@@ -72,8 +72,18 @@ class HumanPlayer extends Player{
 			}
 			if(jokerNum > 0) {
 				while(true) {
-					output_wrapper(DONT_NEED_RESPONSE, "You have " + jokerNum + " jokers.");
-					input = output_wrapper(NEED_RESPONSE, "What do you want your jokers be?");
+					String buffer = "";
+					buffer += "You have" + Integer.toString(jokerNum);
+					buffer += jokerNum > 1 ? "jokers" : "joker";
+					
+					output_wrapper(DONT_NEED_RESPONSE, buffer);	
+
+
+					buffer = "";
+					buffer += "What do you want your ";
+					buffer += jokerNum > 1 ? "jokers" : "joker";
+					buffer += " be?";
+					input = output_wrapper(NEED_RESPONSE, buffer);
 					//input = scanner.nextLine();
 					String[] cards = input.split(" ");
 					if(cards.length != jokerNum) {
@@ -114,7 +124,10 @@ class HumanPlayer extends Player{
 		ArrayList<Card> retCards = new ArrayList<Card>();
 		Scanner scanner = new Scanner(System.in);
 		ArrayList<Integer> records = new ArrayList<Integer>();
-		output_wrapper(DONT_NEED_RESPONSE, "Please give up " + number + " cards.");
+		String buffer = "";
+		buffer += "Please give up " + Integer.toString(number);
+		buffer += number > 1 ? "cards." : "card.";
+		output_wrapper(DONT_NEED_RESPONSE, buffer);
 		Collections.sort(myCards);
 
 
@@ -125,7 +138,7 @@ class HumanPlayer extends Player{
 			//String input = scanner.nextLine();
 			String[] cardIndices = input.split(" ");
 			if(cardIndices.length != number) {
-				output_wrapper(DONT_NEED_RESPONSE, "Please enter " + number + " cards.");
+				output_wrapper(DONT_NEED_RESPONSE, buffer);
 				continue;
 			}
 			try {	
@@ -299,7 +312,7 @@ class HumanPlayer extends Player{
 	private void print_cards(ArrayList<Card> myCards) {
 		String tmpLine = "";
 		for(int i = 0; i < myCards.size(); i ++) {
-			tmpLine += "(" + i + ")" + myCards.get(i).toString();
+			tmpLine += "(" + i + ")" + myCards.get(i).toString() + " ";
 		}
 		output_wrapper(DONT_NEED_RESPONSE, tmpLine);
 	}
