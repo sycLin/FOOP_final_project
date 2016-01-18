@@ -10,21 +10,53 @@ B01902078 Han-Hao, Chen.
 
 Part 2: How to Divide the Responsibilities
 ==========================================
-
+Firstly, Steven helped build the structure of this project.
+And we spend a night at CSIE building to figure out how many parts were left to be filled.
+[insert picture here]
+And each of us picked 3 favorite items to determine the ultimate distribution.
+[insert picture here]
 
 Part 3: Relations Between the Classes
 =====================================
+ - Daifugo class
+ - Card class
+ - Hand class
+ - Player class
+    - HumanPlayer class
+	- AIPlayer class
+ - Deck class
+ - Server class
+ - Client class
+ - Message class
+
 
 Part 4: Advantages of Our Design
 ================================
+1. The work of each player is independent of one another.
+   It's better for group project since we didn't have to wait for others to finish their work first.
+2. The efforts it takes to find bugs are alleviated significantly.
 
 Part 5: Disadvantages of Our Design
 ===================================
 
+
+
 Part 6: Packages We Used
 ========================
+None.
+
 
 Part 7: How to Play Our Game
 ============================
+The steps are described below:
+1) clone the repository first
+2) use $make run to start the server
+3) for human players, use $make run-client to connect to server
+(P.S. human players need to know the IP address of server to create connection.)
+
+The game logic and the rules can be found on wiki page, or our HackPad memo.
+
+
+
 
 
