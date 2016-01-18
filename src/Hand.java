@@ -2,7 +2,7 @@ package daifugo;
 import java.lang.*;
 import java.util.*;
 
-class Hand {
+class Hand implements Comparable<Hand>{
 	// ----- constants ----- //
 	public static final byte PASS = 0;
 	public static final byte SINGLE = 1;
@@ -286,6 +286,10 @@ class Hand {
 	 */
 	public byte getPower() {
 		return this.power;
+	}
+
+	public int compareTo(Hand another_hand) {
+		return another_hand.getContent().size() -  content.size();
 	}
 
 	/**

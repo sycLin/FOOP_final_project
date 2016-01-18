@@ -235,16 +235,16 @@ class HumanPlayer extends Player{
 			else if((msg.getAction() & Message.ACTION_EXCH_CARD) != 0) {
 				switch(this.get_title()) {
 					case InfoCenter.GRAND_MILLIONAIRE:
-						output_wrapper(DONT_NEED_RESPONSE, "You are the GRAND MILLIONAIRE, now it's your turn to give up TWO BIGGEST cards.");
+						output_wrapper(DONT_NEED_RESPONSE, "You are the GRAND MILLIONAIRE, now it's your turn to give up two cards.");
 						break;
 					case InfoCenter.MILLIONAIRE:
-						output_wrapper(DONT_NEED_RESPONSE, "You are the MILLIONAIRE, now it's your turn to give up THE BIGGEST card.");	
+						output_wrapper(DONT_NEED_RESPONSE, "You are the MILLIONAIRE, now it's your turn to give up one card.");	
 						break;
 					case InfoCenter.NEEDY:
-						output_wrapper(DONT_NEED_RESPONSE, "You are the NEEDY, now it's your turn to give up one card.");		
+						output_wrapper(DONT_NEED_RESPONSE, "You are the NEEDY, now it's your turn to give up THE BIGGEST card.");		
 						break;
 					case InfoCenter.EXTREME_NEEDY:
-						output_wrapper(DONT_NEED_RESPONSE, "You are the EXTREME NEEDY, now it's your turn to give up two cards.");
+						output_wrapper(DONT_NEED_RESPONSE, "You are the EXTREME NEEDY, now it's your turn to give up TWO BIGGEST cards.");
 						break;
 				}
 			}
