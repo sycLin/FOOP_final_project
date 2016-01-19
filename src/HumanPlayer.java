@@ -10,6 +10,15 @@ class HumanPlayer extends Player{
 	public static final int NEED_RESPONSE = 1;
 	public static final int DONT_NEED_RESPONSE = 2;
 	private static final String MAGIC_TOKEN = "[m0therfucker]";
+	public static final String ANSI_RESET = "\u001B[0m";
+	public static final String ANSI_BLACK = "\u001B[30m";
+	public static final String ANSI_RED = "\u001B[31m";
+	public static final String ANSI_GREEN = "\u001B[32m";
+	public static final String ANSI_YELLOW = "\u001B[33m";
+	public static final String ANSI_BLUE = "\u001B[34m";
+	public static final String ANSI_PURPLE = "\u001B[35m";
+	public static final String ANSI_CYAN = "\u001B[36m";
+	public static final String ANSI_WHITE = "\u001B[37m";
 
 	// ----- fields ----- //
 	private Socket mySocket;
@@ -180,7 +189,7 @@ class HumanPlayer extends Player{
 			Hand lastHand;
 			if(msg.getContent() != null) {
 				lastHand = (Hand)msg.getContent();
-				output_wrapper(DONT_NEED_RESPONSE, "The last hand was " + lastHand.toString());
+				output_wrapper(DONT_NEED_RESPONSE, "The last hand was " + ANSI_CYAN + lastHand.toString() + ANSI_RESET + "\n");
 			}
 		}
 		else if(msg.getType() == Message.BASIC) {
@@ -208,10 +217,10 @@ class HumanPlayer extends Player{
 			}
 			// A person played his cards.
 			else if((msg.getAction() & Message.ACTION_PLAYING) != 0) {
+				Hand lastHand = (Hand)msg.getContent();
 				if(myPosition != thisP) {
-					Hand lastHand = (Hand)msg.getContent();
 					print_status(msg);
-					output_wrapper(DONT_NEED_RESPONSE, names[thisP] + "(" + thisP + ")'s hand was " + lastHand.toString());
+					output_wrapper(DONT_NEED_RESPONSE, names[thisP] + "(" + thisP + ")'s hand was " + lastHand.toString() + "\n");
 					
 					// Someone won.
 					if((msg.getAction() & Message.ACTION_WINNING) != 0) {
@@ -219,6 +228,7 @@ class HumanPlayer extends Player{
 					}	
 				}
 				else {
+					output_wrapper(DONT_NEED_RESPONSE, "You played " + lastHand.toString());
 					if((msg.getAction() & Message.ACTION_WINNING) != 0) {
 						output_wrapper(DONT_NEED_RESPONSE, "You won!");	
 					}	
@@ -237,12 +247,12 @@ class HumanPlayer extends Player{
 					Hand lastHand = (Hand)msg.getContent();
 					print_status(msg);
 					output_wrapper(DONT_NEED_RESPONSE, names[thisP] + "(" + thisP + ") passed");
-					output_wrapper(DONT_NEED_RESPONSE, "The last hand was " + lastHand.toString());
+					output_wrapper(DONT_NEED_RESPONSE, "The last hand was " + lastHand.toString() + "\n");
 				}
 			}
 			else if((msg.getAction() & Message.ACTION_LEADING) != 0) {
 
-				output_wrapper(DONT_NEED_RESPONSE, "----- Trick " + Integer.toString((int)msg.getContent()) + " -----");
+				output_wrapper(DONT_NEED_RESPONSE, "---------- Trick " + Integer.toString((int)msg.getContent()) + " ----------");
 				output_wrapper(DONT_NEED_RESPONSE, "The leader of this trick is " + names[thisP] + "(" + thisP +")");
 			}
 			else if((msg.getAction() & Message.ACTION_EXCH_CARD) != 0) {
@@ -263,13 +273,16 @@ class HumanPlayer extends Player{
 			}
 			
 			else if((msg.getAction() & Message.ACTION_ABAN_CARD) != 0) {
+				ArrayList<Card> abanCards = (ArrayList<Card>)msg.getContent();
 				if(thisP != myPosition) {
-					ArrayList<Card> abanCards = (ArrayList<Card>)msg.getContent();
 					output_wrapper(DONT_NEED_RESPONSE, names[thisP] + "(" + thisP +") abandoned " + abanCards.size() + " cards.");
 					output_wrapper(DONT_NEED_RESPONSE, "The abandoned cards are:");
 					print_cards(abanCards);	
 				}
-				
+				else {
+					output_wrapper(DONT_NEED_RESPONSE, "You abandoned:");
+					print_cards(abanCards);
+				}
 			}
 			else if((msg.getAction() & Message.ACTION_UPDT_SCORE) != 0) {
 				int[] scores = (int[])msg.getContent();
@@ -286,8 +299,9 @@ class HumanPlayer extends Player{
 					
 					names[i] = tmpNames[i];	
 					output_wrapper(DONT_NEED_RESPONSE, "Player at position " + i + ": " + names[i]);
-					output_wrapper(DONT_NEED_RESPONSE, "Your position: " + myPosition);
+					
 				}
+				output_wrapper(DONT_NEED_RESPONSE, "Your position: " + myPosition);
 				
 			}
 			else if((msg.getAction() & Message.ACTION_THE_END) != 0) {
@@ -300,7 +314,7 @@ class HumanPlayer extends Player{
 		Scanner scanner = new Scanner(System.in);
 		while(true) {
 			String tmp = output_wrapper(NEED_RESPONSE, "Please enter your name:");
-			//String tmp = scanner.nextLine();
+			
 			if(tmp.length() > Player.MAX_NAME_LENGTH) {
 				output_wrapper(DONT_NEED_RESPONSE, "Please enter name length smaller than 50.");
 				continue;
@@ -314,6 +328,7 @@ class HumanPlayer extends Player{
 		for(int i = 0; i < myCards.size(); i ++) {
 			tmpLine += "(" + i + ")" + myCards.get(i).toString() + " ";
 		}
+		tmpLine += "\n";
 		output_wrapper(DONT_NEED_RESPONSE, tmpLine);
 	}
 	private boolean repeat_record(ArrayList<Integer> records) {
@@ -327,7 +342,11 @@ class HumanPlayer extends Player{
 	}
 	private void print_status(Message msg) {
 		String tmpLine = "";
-		output_wrapper(DONT_NEED_RESPONSE, "---------- STATUS ----------");
+		// final String ANSI_CLS = "\u001b[2J";
+        // final String ANSI_HOME = "\u001b[H";
+        //System.out.print(ANSI_CLS + ANSI_HOME);
+        //System.out.flush();
+		output_wrapper(DONT_NEED_RESPONSE,ANSI_RED +  "---------- STATUS ----------");
 		tmpLine += "| isUnderRevolution: " + msg.isUnderRevolution();
 		tmpLine += msg.isUnderRevolution() ? "  |\n" : " |\n";
 		
@@ -337,7 +356,7 @@ class HumanPlayer extends Player{
 		tmpLine += 	"| isTight:           " + msg.isTight();
 		tmpLine += msg.isTight() ? "  |\n" : " |\n";
 		
-		tmpLine += 	"----------------------------";
+		tmpLine += 	"----------------------------" + ANSI_RESET;
 		output_wrapper(DONT_NEED_RESPONSE, tmpLine);
 	}
 

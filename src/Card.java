@@ -172,17 +172,34 @@ final class Card implements Comparable<Card> {
 	public String toString() {
 		String ret = "[";
 		switch(suit) {
+			// case CLUB:
+			// 	ret += "C";
+			// 	break;
+			// case DIAMOND:
+			// 	ret += "D";
+			// 	break;
+			// case HEART:
+			// 	ret += "H";
+			// 	break;
+			// case SPADE:
+			// 	ret += "S";
+			// 	break;
+			// case JOKER:
+			// 	ret += "*";
+			// 	break;
+			// default: // unknown suit...
+			// 	ret += "X";
 			case CLUB:
-				ret += "C";
+				ret += '\u2663';
 				break;
 			case DIAMOND:
-				ret += "D";
+				ret += '\u2666';
 				break;
 			case HEART:
-				ret += "H";
+				ret += '\u2764';
 				break;
 			case SPADE:
-				ret += "S";
+				ret += '\u2660';
 				break;
 			case JOKER:
 				ret += "*";

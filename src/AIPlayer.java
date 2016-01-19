@@ -6,15 +6,12 @@ class AIPlayer extends Player{
 
 	private Hand lastHand;
 	private boolean lead;
-	private boolean isReversed;
-	private boolean isTight;
 	private int myPosition;
 	private boolean forcedExch;
 
 	public AIPlayer() {
 		super();
 		lead = false;
-		isReversed = false;
 		forcedExch = false;
 	}
 
@@ -157,111 +154,6 @@ class AIPlayer extends Player{
 			}
 		}
 
-		// ArrayList<Card> tmpJokers = new ArrayList<Card>();
-		// // Remove JOKERS from myCards first
-		// // In the implementation, it doesn't need to go back.
-		// for(int i = 0; i < 2; i ++) {
-		// 	if(myCards.get(myCards.size() - 1).getSuit() == Card.JOKER) {
-		// 		tmpJokers.add(myCards.get(myCard.size() - 1));
-		// 		myCards.remove(myCards.size() - 1);
-		// 	}
-		// }
-		// // Move ACEs and TWOs to the last.
-		// for(int i = 0; i < myCards.size(); i ++) {
-		// 	if(myCards.get(0).getRank() <= 2) {
-		// 		myCards.add(myCards.get(i));
-		// 		myCards.remove(0);
-		// 	}
-		// 	else {
-		// 		break;
-		// 	}
-		// }
-
-		// // Create four ArrayList<Card> representing four Suit.
-		// ArrayList<Card> clubs = new ArrayList<Card>();
-		// ArrayList<Card> diamonds = new ArrayList<Card>();
-		// ArrayList<Card> hearts = new ArrayList<Card>();
-		// ArrayList<Card> spades = new ArrayList<Card>();
-
-		// // And separate myCards into four suits.
-		// for(int i = 0; i < myCards.size(); i ++) {
-		// 	switch(myCards.get(i).getSuit()) {
-		// 		case Card.CLUB:
-		// 			clubs.add(myCards.get(i));
-		// 			break;
-		// 		case Card.DIAMOND:
-		// 			diamonds.add(myCards.get(i));
-		// 			break;
-		// 		case Card.HEART:
-		// 			hearts.add(myCards.get(i));
-		// 			break;
-		// 		case Card.SPADE:
-		// 			spade.add(myCards.get(i));
-		// 			break;
-		// 	}
-		// }
-		// ArrayList<ArrayList<Card>> all = new ArrayList<ArrayList<Card>>();
-		// all.add(clubs);
-		// all.add(diamonds);
-		// all.add(hearts);
-		// all.add(spades);
-
-
-		// Hand tmpHand;
-		// for(int i = 0; i < 4; i ++) {
-		// 	ArrayList<Card> sameSuits = all.get(i);
-		// 	for(int j = 0; j < sameSuits.size() - 3; j ++) {
-		// 		// [STRAIGHT_FLUSH] Detection
-		// 		// Case 1: WITHOUT JOKERS
-		// 		tmpCards.clear();
-		// 		for(int k = 0; k < 4; k ++) {
-		// 			tmpCards.add(sameSuits.get(j + k));
-		// 		}
-		// 		tmpHand = new Hand(tmpCards);
-		// 		if(tmpHand.isStraightFlush()) {
-		// 			allHands.add(tmpHand);
-		// 		}
-
-		// 		// Case 2: WITH one JOKER
-		// 		if(tmpJokers.size() == 1) {
-		// 			// Case 2.1: [JOKER][1][2][3]
-		// 			tmpCards.clear();
-		// 			if(sameSuits.get(j).getRealRank() > 3) {
-		// 				tmpCards.add(new Card(sameSuits.get(j).getSuit(), sameSuits.get(j).getRealRank() - 1));
-		// 				for(int k = 0; k < 3; k ++) {
-		// 					tmpCards.add(sameSuits.get(j + k));
-		// 				}
-		// 			}
-		// 			tmpHand = new Hand(tmpCards);
-		// 			if(tmpHand.isStraightFlush()) {
-		// 				jokerAs.clear();
-		// 				jokerAs.add(tmpCards.get(0));
-		// 				allHands.add(tmpHand);
-		// 			}
-		// 			// Case 2.2: [1][JOKER][2][3]
-		// 			tmpCards.clear();
-		// 			tmpCards.add(new Card(sameSuits.get(j).getSuit(), sameSuits.get(j).getRealRank() + 1));
-		// 			for(int k = 0; k < 3; k ++) {
-		// 				tmpCards.add(sameSuits.get(j + k));
-		// 			}
-		// 			tmpHand = new Hand(tmpCards);
-		// 			if(tmpHand.isStraightFlush()) {
-		// 				allHands.add(tmpHand);
-		// 			}
-		// 			// Case 2.2: [1][2][JOKER][3]
-		// 			tmpCards.clear();
-		// 			tmpCards.add(new Card(sameSuits.get(j).getSuit(), sameSuits.get(j).getRealRank() + 1));
-		// 			// Case 2.2: [1][2][3][JOKER]
-		// 		}
-				
-
-				
-
-		// }
-		
-
-		
-
 		return allHands;
 	}
 
@@ -272,20 +164,17 @@ class AIPlayer extends Player{
 		Collections.sort(myCards);
 		Hand retHand;
 		byte type;
-		//System.out.println("FINDING ALL HANDS");
+		
+		// Find all possible hands
 		ArrayList<Hand> allHands = find_all_hands(myCards);
 		Collections.sort(allHands);
 
 		// DEBUGGING MODE
-		System.out.print(myPosition + ":");
-		print_cards(myCards);
-		// for(int i = 0; i < allHands.size(); i ++) {
-		// 	System.out.println(allHands.get(i).toString());
-		// }
-
+		// System.out.print(myPosition + ":");
+		// print_cards(myCards);
+		
 		if(lead) {
 			lead = !lead;
-			//int rand = (int)(Math.random() * allHands.size());
 			for(int i = 0; i < allHands.size(); i ++) {
 				byte tmp = allHands.get(i).getContent().get(0).getRank();
 				if(tmp == (byte)7 || tmp == (byte)10) {
@@ -299,17 +188,14 @@ class AIPlayer extends Player{
 
 		for(int i = 0; i < allHands.size(); i ++) {
 			if(Daifugo.canBeat(allHands.get(i).beats(lastHand), lastHand, allHands.get(i))) {
-				System.out.println(allHands.get(i).toString());
-				System.out.println(" can beat ");
-				System.out.println(lastHand.toString());
+				// System.out.println(allHands.get(i).toString());
+				// System.out.println(" can beat ");
+				// System.out.println(lastHand.toString());
 				return allHands.get(i);
 			}
 		}
 
-		// DEBUGGING MODE
-		// Scanner scanner = new Scanner(System.in);
-		// String x = scanner.nextLine();
-		System.out.println("PASS");
+		// PASS
 		return new Hand(retCards);
 	}
 
@@ -317,6 +203,8 @@ class AIPlayer extends Player{
 	public ArrayList<Card> give_up_card(ArrayList<Card> myCards, int number) {
 		ArrayList<Card> retCards = new ArrayList<Card>();
 		ArrayList<Card> arragedMyCards = rearrange(myCards);
+
+		// NEEDY OR EXTREME_NEEDY need to give up the biggest cards at the start of the round.
 		if(forcedExch) {
 			forcedExch = false;
 
@@ -332,8 +220,8 @@ class AIPlayer extends Player{
 			return myCards;
 		}
 
-		// GIVE UP SMALLEST cards
-		System.out.println("GIVE UP CARD");
+		
+		
 		// GIVE UP SEVEN & TEN FIRST
 		for(int i = 0; i < myCards.size() && number > 0; i ++) {
 			byte tmp = arragedMyCards.get(i).getRank();
@@ -343,10 +231,12 @@ class AIPlayer extends Player{
 				retCards.add(arragedMyCards.get(i));
 			}
 		}
+
+		// GIVE UP SMALLEST cards
 		for(int i = 0; i < number; i ++) {
 			retCards.add(arragedMyCards.get(i));
 		}
-		System.out.print("Give up ");
+		
 		for(int i = 0; i < number; i ++) {
 			System.out.print(retCards.get(i).toString());
 		}
@@ -354,6 +244,9 @@ class AIPlayer extends Player{
 		return retCards;
 	}
 
+	/**
+	 *	Sort the cards according to the "Real" rank.
+	 */
 	private ArrayList<Card> rearrange(ArrayList<Card> myCards) {
 		ArrayList<Card> retCards = new ArrayList<Card>();
 		Collections.sort(myCards);
@@ -370,63 +263,42 @@ class AIPlayer extends Player{
 		return retCards;
 	}
 
-	private void print_cards(ArrayList<Card> myCards) {
-		String tmpLine = "";
-		for(int i = 0; i < myCards.size(); i ++) {
-			tmpLine += myCards.get(i).toString();
-		}
-		System.out.println(tmpLine);
-	}
+	// private void print_cards(ArrayList<Card> myCards) {
+	// 	String tmpLine = "";
+	// 	for(int i = 0; i < myCards.size(); i ++) {
+	// 		tmpLine += myCards.get(i).toString();
+	// 	}
+	// 	System.out.println(tmpLine);
+	// }
 
 	public void update_info(Message msg) {
-		// A person played his cards.
+		// A person played his cards, record his cards.
 		if((msg.getAction() & Message.ACTION_PLAYING) != 0) {
 			lastHand = (Hand)msg.getContent();
-			isReversed = msg.isUnderRevolution() ^ msg.isUnderJackBack();
-			
-			isTight = msg.isTight();
-			// System.out.println("Player" + Integer.toString(msg.getPlayer()) + "'s hand was " + lastHand.toString());
-			// Someone won.
-			if((msg.getAction() & Message.ACTION_WINNING) != 0) {
-				System.out.println("Player at position " + msg.getPlayer() + "won.");	
-			}
 		}
 
-		// DONE
+		// This AI leads this trick, can't PASS, can play any legal hand.
 		else if((msg.getAction() & Message.ACTION_LEADING) != 0) {
-			//System.out.println("----- Trick " + Integer.toString((int)msg.getContent()) + " -----");
-			//System.out.println("The leader of this trick is position " + Integer.toString(msg.getPlayer()));
 			if(myPosition == msg.getPlayer()) {
 				lead = true;
 			}
 		}
 
-		// DONE
+		// If NEEDY or EXTREME_NEEDY, they are forced to give the biggest cards.
 		else if((msg.getAction() & Message.ACTION_EXCH_CARD) != 0) {
 			if(this.get_title() == InfoCenter.NEEDY || this.get_title() == InfoCenter.EXTREME_NEEDY) {
 				forcedExch = true;
-				System.out.println("HAHAHA");
-			}
-			else {
-				System.out.println("HEYHEY");
 			}
 		}
 
+		// Update my position (position changes in every round)
 		else if((msg.getAction() & Message.ACTION_UPDT_POS) != 0) {
 			myPosition = msg.getPlayer();
-			String[] tmpNames = (String[])msg.getContent();
-			
 		}
-		else if((msg.getAction() & Message.ACTION_UPDT_SCORE) != 0) {
-			int[] scores = (int[])msg.getContent();
-			System.out.println("------ SCORES ------");
-			for(int i = 0; i < 4; i ++) {
-				System.out.println(i + ": " + scores[i]);
-			}
-		}
+
 	}
 	public void enter_name() {
-		name = "9527";
+		name = "AI";
 	}
 }
 
