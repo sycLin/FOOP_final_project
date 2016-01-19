@@ -19,10 +19,11 @@ Demo Flow Chart
  - technical details
 - AI implementation: ***45 seconds***
  - strategy
+ - great for debug
 - Class structure: ***0.5 minute***
  - definitions and functionality
  - relations
 - Work distribution: ***0.5 minute***
 - Demo: ***2 minutes***
  - 2 human players versus 2 AI players?
-
+ - let 4 AIs run for 10 thousand times.
