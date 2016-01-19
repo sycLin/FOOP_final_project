@@ -10,6 +10,7 @@ Demo Flow Chart
 ---------------
 (6 minutes in total)
 * Demo time slot => from 13:40 to 14:00
+
 [x] Introduction to the Game: 1.5 minutes
 [x] Socket programming: 45 seconds
 [x] AI implementation: 45 seconds
