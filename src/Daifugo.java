@@ -65,12 +65,15 @@ public class Daifugo {
 				System.err.print(players.get(i).get_name()+" "+infoCenter.getPlayerStatus(players.get(i)));
 			}
 			System.err.println();
-
+			boolean nextFlag = false;
 			while(infoCenter.getPlayingNumber() > 0) {
 				for(int i=0; i<nPlayer; i++) {
 					Player p = players.get(i);
+					if(infoCenter.getPlayerNoHand(p) && infoCenter.getPlayerIsLastPlayer(p)) {
+						nextFlag = true;
+					}
 					if(!infoCenter.getPlayerNoHand(p)) {
-						
+						int playing = infoCenter.getPlayingNumber();
 						if(effectNumber > 0) {
 							effectNumber -= 1;
 							System.out.println("Skip "+p.get_name()+".");
@@ -131,10 +134,11 @@ public class Daifugo {
 							effectNumber = getAndCheckHand(infoCenter, players, p);
 
 						} else if(!infoCenter.getPlayerIsLeader(p) && !infoCenter.getPlayerIsLastPlayer(p) &&
-									infoCenter.getPlayingNumber() == skipNumber) {
+									nextFlag) {
 							// 
 							// become leader and the last player, can't skip, do anythings you want
 							// 
+							nextFlag = false;
 							System.err.println("-------"+"Tricks "+(++trick)+"-------");
 							skipNumber = 0;
 							isTight = false;
@@ -166,9 +170,8 @@ public class Daifugo {
 							skipNumber = 0;
 							msg = new Message(i, Message.ACTION_LOSING, (Object)infoCenter.getPlayerHand(p), isUnderRevolution, isUnderJackBack, isTight);
 
-							int playing = infoCenter.getPlayingNumber() - 1;
 							infoCenter.setPlayerNoHand(p);
-							infoCenter.setPlayerStatus(p, infoCenter.getStatus(playing));
+							infoCenter.setPlayerStatus(p, infoCenter.getStatus(infoCenter.currentIndex_s+(playing-1)));
 
 							updateInfo(players);
 
@@ -186,7 +189,7 @@ public class Daifugo {
 									// gm become EXTREME_NEEDY and no hand
 									// 
 									msg = new Message(players.indexOf(gm), Message.ACTION_LOSING, (Object)infoCenter.getPlayerHand(gm), isUnderRevolution, isUnderJackBack, isTight);
-									infoCenter.setPlayerStatus(gm, InfoCenter.EXTREME_NEEDY);
+									infoCenter.setPlayerStatus(gm, infoCenter.getStatus(infoCenter.currentIndex_s+(playing-2)));
 									infoCenter.setPlayerNoHand(gm);
 									updateInfo(players);
 								} 

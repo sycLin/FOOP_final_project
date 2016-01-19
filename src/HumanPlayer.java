@@ -72,8 +72,18 @@ class HumanPlayer extends Player{
 			}
 			if(jokerNum > 0) {
 				while(true) {
-					output_wrapper(DONT_NEED_RESPONSE, "You have " + jokerNum + " jokers.");
-					input = output_wrapper(NEED_RESPONSE, "What do you want your jokers be?");
+					String buffer = "";
+					buffer += "You have" + Integer.toString(jokerNum);
+					buffer += jokerNum > 1 ? "jokers" : "joker";
+					
+					output_wrapper(DONT_NEED_RESPONSE, buffer);	
+
+
+					buffer = "";
+					buffer += "What do you want your ";
+					buffer += jokerNum > 1 ? "jokers" : "joker";
+					buffer += " be?";
+					input = output_wrapper(NEED_RESPONSE, buffer);
 					//input = scanner.nextLine();
 					String[] cards = input.split(" ");
 					if(cards.length != jokerNum) {
@@ -114,7 +124,10 @@ class HumanPlayer extends Player{
 		ArrayList<Card> retCards = new ArrayList<Card>();
 		Scanner scanner = new Scanner(System.in);
 		ArrayList<Integer> records = new ArrayList<Integer>();
-		output_wrapper(DONT_NEED_RESPONSE, "Please give up " + number + " cards.");
+		String buffer = "";
+		buffer += "Please give up " + Integer.toString(number);
+		buffer += number > 1 ? "cards." : "card.";
+		output_wrapper(DONT_NEED_RESPONSE, buffer);
 		Collections.sort(myCards);
 
 
@@ -125,7 +138,7 @@ class HumanPlayer extends Player{
 			//String input = scanner.nextLine();
 			String[] cardIndices = input.split(" ");
 			if(cardIndices.length != number) {
-				output_wrapper(DONT_NEED_RESPONSE, "Please enter " + number + " cards.");
+				output_wrapper(DONT_NEED_RESPONSE, buffer);
 				continue;
 			}
 			try {	
@@ -235,16 +248,16 @@ class HumanPlayer extends Player{
 			else if((msg.getAction() & Message.ACTION_EXCH_CARD) != 0) {
 				switch(this.get_title()) {
 					case InfoCenter.GRAND_MILLIONAIRE:
-						output_wrapper(DONT_NEED_RESPONSE, "You are the GRAND MILLIONAIRE, now it's your turn to give up TWO BIGGEST cards.");
+						output_wrapper(DONT_NEED_RESPONSE, "You are the GRAND MILLIONAIRE, now it's your turn to give up two cards.");
 						break;
 					case InfoCenter.MILLIONAIRE:
-						output_wrapper(DONT_NEED_RESPONSE, "You are the MILLIONAIRE, now it's your turn to give up THE BIGGEST card.");	
+						output_wrapper(DONT_NEED_RESPONSE, "You are the MILLIONAIRE, now it's your turn to give up one card.");	
 						break;
 					case InfoCenter.NEEDY:
-						output_wrapper(DONT_NEED_RESPONSE, "You are the NEEDY, now it's your turn to give up one card.");		
+						output_wrapper(DONT_NEED_RESPONSE, "You are the NEEDY, now it's your turn to give up THE BIGGEST card.");		
 						break;
 					case InfoCenter.EXTREME_NEEDY:
-						output_wrapper(DONT_NEED_RESPONSE, "You are the EXTREME NEEDY, now it's your turn to give up two cards.");
+						output_wrapper(DONT_NEED_RESPONSE, "You are the EXTREME NEEDY, now it's your turn to give up TWO BIGGEST cards.");
 						break;
 				}
 			}
@@ -299,7 +312,7 @@ class HumanPlayer extends Player{
 	private void print_cards(ArrayList<Card> myCards) {
 		String tmpLine = "";
 		for(int i = 0; i < myCards.size(); i ++) {
-			tmpLine += "(" + i + ")" + myCards.get(i).toString();
+			tmpLine += "(" + i + ")" + myCards.get(i).toString() + " ";
 		}
 		output_wrapper(DONT_NEED_RESPONSE, tmpLine);
 	}

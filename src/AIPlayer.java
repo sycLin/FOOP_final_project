@@ -79,10 +79,13 @@ class AIPlayer extends Player{
 				if(myCards.get(i).getRank() == myCards.get(i + 1).getRank()) {
 					// First add [PAIR] to all hands
 					tmpCards.clear();
-					for(int j = 0; j < 2; j ++) {
-						tmpCards.add(myCards.get(i + j));
+					if(myCards.get(i).getSuit() != Card.JOKER) {
+						for(int j = 0; j < 2; j ++) {
+							tmpCards.add(myCards.get(i + j));
+						}
+						allHands.add(new Hand(tmpCards));	
 					}
-					allHands.add(new Hand(tmpCards));
+					
 					// Then add PAIR plus JOKER as [THREE_OF_A_KIND]
 					if(myCards.get(i).getSuit() != Card.JOKER && 
 					   myCards.get(myCards.size() - 1).getSuit() == Card.JOKER) {
@@ -95,6 +98,10 @@ class AIPlayer extends Player{
 					if(myCards.get(i).getSuit() != Card.JOKER &&
 					   myCards.get(myCards.size() - 1).getSuit() == Card.JOKER &&
 					   myCards.get(myCards.size() - 2).getSuit() == Card.JOKER) {
+					   	tmpCards.clear();
+					   	for(int j = 0; j < 2; j ++) {
+							tmpCards.add(myCards.get(i + j));
+						}
 						tmpCards.add(myCards.get(myCards.size() - 1));
 						tmpCards.add(myCards.get(myCards.size() - 2));
 						jokerAs.clear();
@@ -261,16 +268,13 @@ class AIPlayer extends Player{
 	public Hand play_card(ArrayList<Card> myCards) {
 		ArrayList<Card> retCards = new ArrayList<Card>();
 		ArrayList<Card> jokerAs = new ArrayList<Card>();
-		if(myCards.size() <= 1) {
-			retCards.add(myCards.get(0));
-			return new Hand(retCards);
-		}
+		myCards = rearrange(myCards);
 		Collections.sort(myCards);
 		Hand retHand;
 		byte type;
-		System.out.println("FINDING ALL HANDS");
+		//System.out.println("FINDING ALL HANDS");
 		ArrayList<Hand> allHands = find_all_hands(myCards);
-
+		Collections.sort(allHands);
 
 		// DEBUGGING MODE
 		System.out.print(myPosition + ":");
@@ -281,9 +285,16 @@ class AIPlayer extends Player{
 
 		if(lead) {
 			lead = !lead;
-			int rand = (int)(Math.random() * allHands.size());
-			System.out.println(allHands.get(rand).toString());
-			return allHands.get(rand);
+			//int rand = (int)(Math.random() * allHands.size());
+			for(int i = 0; i < allHands.size(); i ++) {
+				byte tmp = allHands.get(i).getContent().get(0).getRank();
+				if(tmp == (byte)7 || tmp == (byte)10) {
+					System.out.println(allHands.get(i).toString());
+					return allHands.get(i);
+				}
+			}
+			System.out.println(allHands.get(0).toString());
+			return allHands.get(0);
 		}
 
 		for(int i = 0; i < allHands.size(); i ++) {
@@ -302,37 +313,18 @@ class AIPlayer extends Player{
 		return new Hand(retCards);
 	}
 
-	private int[] generate_random(int rng, int number) {
-		int[] ret = new int[number];
-		boolean flag;
-		for(int i = 0; i < number; i ++) {
-			
-			while(true) {
-				flag = true;
-				ret[i] = (int)Math.random() * rng;
-				for(int j = 0; j < i; j ++) {
-					if(ret[i] == ret[j]) {
-						flag = false;
-					}
-				}
-				if(flag) {
-					break;
-				}
-			}
-		}
-		return ret;
-	}
 
 	public ArrayList<Card> give_up_card(ArrayList<Card> myCards, int number) {
 		ArrayList<Card> retCards = new ArrayList<Card>();
 		ArrayList<Card> arragedMyCards = rearrange(myCards);
 		if(forcedExch) {
 			forcedExch = false;
+
 			// GIVE UP BIGGEST cards
 			for(int i = 0; i < number; i ++) {
 				retCards.add(arragedMyCards.get(myCards.size() - i - 1));
 			}
-			System.out.println("I've paid what I needed to pay.");
+			
 			return retCards;
 		}
 
@@ -342,10 +334,23 @@ class AIPlayer extends Player{
 
 		// GIVE UP SMALLEST cards
 		System.out.println("GIVE UP CARD");
-		//int[] randNums = generate_random(myCards.size(), number);
+		// GIVE UP SEVEN & TEN FIRST
+		for(int i = 0; i < myCards.size() && number > 0; i ++) {
+			byte tmp = arragedMyCards.get(i).getRank();
+
+			if(tmp == (byte)7 || tmp == (byte)10) {
+				number --;
+				retCards.add(arragedMyCards.get(i));
+			}
+		}
 		for(int i = 0; i < number; i ++) {
 			retCards.add(arragedMyCards.get(i));
 		}
+		System.out.print("Give up ");
+		for(int i = 0; i < number; i ++) {
+			System.out.print(retCards.get(i).toString());
+		}
+		System.out.println("");
 		return retCards;
 	}
 
@@ -362,15 +367,6 @@ class AIPlayer extends Player{
 				retCards.add(myCards.get(i));
 			}	
 		}
-		// for(int i = 0; i < myCards.size(); i ++) {
-		// 	System.out.print(myCards.get(i).toString());
-		// }
-		// System.out.print("\n");
-		// for(int i = 0; i < myCards.size(); i ++) {
-		// 	System.out.print(retCards.get(i).toString());
-		// }
-		// Scanner scanner = new Scanner(System.in);
-		// String x = scanner.nextLine();
 		return retCards;
 	}
 
@@ -419,13 +415,6 @@ class AIPlayer extends Player{
 		else if((msg.getAction() & Message.ACTION_UPDT_POS) != 0) {
 			myPosition = msg.getPlayer();
 			String[] tmpNames = (String[])msg.getContent();
-			
-			// for(int i = 0; i < 4; i ++) {
-				
-			// 	names[i] = tmpNames[i];	
-			// 	output_wrapper(DONT_NEED_RESPONSE, "Player at position " + i + ": " + names[i]);
-			// 	output_wrapper(DONT_NEED_RESPONSE, "Your position: " + myPosition);
-			// }
 			
 		}
 		else if((msg.getAction() & Message.ACTION_UPDT_SCORE) != 0) {
