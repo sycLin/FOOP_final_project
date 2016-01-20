@@ -246,6 +246,8 @@ class AIPlayer extends Player{
 
 	/**
 	 *	Sort the cards according to the "Real" rank.
+	 * @param myCards the cards to be sorted
+	 * @return an arraylist of cards that is sorted
 	 */
 	private ArrayList<Card> rearrange(ArrayList<Card> myCards) {
 		ArrayList<Card> retCards = new ArrayList<Card>();

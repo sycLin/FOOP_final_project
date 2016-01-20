@@ -384,7 +384,6 @@ public class Daifugo {
 	 * @param _infoCenter InfoCenter reference
 	 * @param _players ArrayList of Player reference
 	 * @param _player Crrent player reference
-	 * @param _currentHand current hand on table
 	 * @return effect type in integer
 	 */
 	public static int getAndCheckHand(InfoCenter _infoCenter, ArrayList<Player> _players, Player _player) {
@@ -1031,7 +1030,7 @@ class InfoCenter {
 	 * to check whether player has this hand
 	 * @param _player player object
 	 * @param _cards cards to be checked
-	 * @retrun if player has this hand
+	 * @return if player has this hand
 	 */
 	public boolean getPlayerHasThisHand(Player _player, ArrayList<Card> _cards) {
 		int index = this.getPlayerIndex(_player);

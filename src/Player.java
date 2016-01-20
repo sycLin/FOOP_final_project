@@ -22,7 +22,7 @@ public abstract class Player {
 
 	/**
 	 * to increase the number of points this player has
-	 * @param the amount of points to add
+	 * @param amount the amount of points to add
 	 */
 	public final void win_points(int amount) {
 		point += amount;
@@ -30,7 +30,7 @@ public abstract class Player {
 	
 	/**
 	 * to decrease the number of points this player has
-	 * @param the amount of points to decrease
+	 * @param amount the amount of points to decrease
 	 */
 	public final void lose_points(int amount) {
 		point -= amount;
@@ -54,7 +54,7 @@ public abstract class Player {
 
 	/**
 	 * to get the title of this player
-	 * @param the title of this player
+	 * @return the title of this player
 	 */
 	public final byte get_title() {
 		byte ret = title;
@@ -63,7 +63,8 @@ public abstract class Player {
 
 
 	/**
-	 *	Get player's name.
+	 * to get the player's name.
+	 * @return a string of player's name.
 	 */
 	public final String get_name() {
 		String n = name;
@@ -75,6 +76,9 @@ public abstract class Player {
 	public abstract Hand play_card(ArrayList<Card> myCards);
 	/**
 	 *	Give up number cards (7 or 10)
+	 * @param myCards my current cards
+	 * @param number how many cards to give up
+	 * @return an arraylist of cards that are to give up
 	 */
 	public abstract ArrayList<Card> give_up_card(ArrayList<Card> myCards, int number);
 	public abstract void update_info(Message msg);
